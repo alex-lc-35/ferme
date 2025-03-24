@@ -62,6 +62,10 @@ class Product
     public function __construct()
     {
         $this->productOrders = new ArrayCollection();
+        $this->isDisplayed = false;
+        $this->hasStock = false;
+        $this->limited = false;
+        $this->discount = false;
     }
 
 
