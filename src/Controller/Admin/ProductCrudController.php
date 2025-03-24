@@ -69,7 +69,8 @@ class ProductCrudController extends AbstractCrudController
             IntegerField::new('inter')->hideOnIndex(),
 
             BooleanField::new('hasStock')->hideOnIndex()->setLabel('Stock'),
-            IntegerField::new('stock')->onlyWhenUpdating(),
+
+            IntegerField::new('stock')->onlyOnForms(),
 
             BooleanField::new('isDisplayed')->setLabel('Affiché'),
             BooleanField::new('limited')->setLabel('Qté Limitée'),
