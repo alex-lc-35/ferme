@@ -13,7 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Bundle\SecurityBundle\Security;
-
+use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 class ProductCrudController extends AbstractCrudController
 {
     private Security $security;
@@ -36,7 +36,12 @@ class ProductCrudController extends AbstractCrudController
                 ->hideOnIndex(),
 
             TextField::new('name')->setLabel('Nom'),
-            IntegerField::new('price')->setLabel('Prix'),
+
+            MoneyField::new('priceInEuros')
+                ->setLabel('Prix (€)')
+                ->setCurrency('EUR')
+                ->setStoredAsCents(false)
+                ->setNumDecimals(2),
 
             ChoiceField::new('unit')
                 ->setLabel('Unité')
