@@ -16,7 +16,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Bundle\SecurityBundle\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 class ProductCrudController extends AbstractCrudController
 {
     private Security $security;
@@ -111,8 +113,7 @@ class ProductCrudController extends AbstractCrudController
             ImageField::new('image')
                 ->setBasePath('/uploads/images')
                 ->setUploadDir('public/uploads/images')
-                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
-                ->hideOnIndex(),
+                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]'),
 
             AssociationField::new('user')
                 ->hideOnForm()
@@ -132,6 +133,17 @@ class ProductCrudController extends AbstractCrudController
     public function configureAssets(Assets $assets): Assets
     {
         return $assets->addJsFile('js/admin/product-form.js');
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $returnAction = Action::new('Retour')
+            ->linkToUrl('/admin/product');
+
+        return $actions
+            ->add(Crud::PAGE_NEW, $returnAction)
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $a) => $a->setLabel('Ajouter un produit'));
+
     }
 
 
