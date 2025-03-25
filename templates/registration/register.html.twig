@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4">
+        <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-md">
+            <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Créer un compte</h1>
+
+            {{ form_start(registrationForm) }}
+
+            <div class="space-y-4">
+
+                {{ form_row(registrationForm.firstName, {
+                    attr: { class: 'w-full p-3 border rounded-lg', placeholder: 'Prénom' },
+                    label_attr: { class: 'block text-sm font-medium text-gray-700' }
+                }) }}
+
+                {{ form_row(registrationForm.lastName, {
+                    attr: { class: 'w-full p-3 border rounded-lg', placeholder: 'Nom' },
+                    label_attr: { class: 'block text-sm font-medium text-gray-700' }
+                }) }}
+
+                {{ form_row(registrationForm.email, {
+                    attr: { class: 'w-full p-3 border rounded-lg', placeholder: 'Adresse email' },
+                    label_attr: { class: 'block text-sm font-medium text-gray-700' }
+                }) }}
+
+                {{ form_row(registrationForm.phone, {
+                    attr: { class: 'w-full p-3 border rounded-lg', placeholder: 'Numéro de téléphone' },
+                    label_attr: { class: 'block text-sm font-medium text-gray-700' }
+                }) }}
+
+                <div>
+                    <label for="password-toggle" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                    <div class="relative">
+                        {{ form_widget(registrationForm.plainPassword, {
+                            attr: {
+                                class: 'w-full p-3 border rounded-lg pr-10 password-input',
+                                placeholder: 'Mot de passe'
+                            }
+                        }) }}
+                        <button type="button" onclick="togglePassword()" id="toggle-icon" class="absolute right-3 top-3 text-xl">
+                            👁
+                        </button>
+
+                    </div>
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+
+                {{ form_row(registrationForm.agreeTerms, {
+                    label_attr: { class: 'text-sm text-gray-700 flex items-center' }
+                }) }}
+            </div>
+
+            <button type="submit"
+                    class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+                S'inscrire
+            </button>
+
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.querySelector('.password-input');
+            const icon = document.getElementById('toggle-icon');
+
+            if (input) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = '👁‍🗨';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = '👁';
+                }
+            }
+        }
+    </script>
+
+
+{% endblock %}
