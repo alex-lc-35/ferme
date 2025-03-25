@@ -11,9 +11,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Bundle\SecurityBundle\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+
 class ProductCrudController extends AbstractCrudController
 {
     private Security $security;
@@ -28,6 +31,7 @@ class ProductCrudController extends AbstractCrudController
         return Product::class;
     }
 
+
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -41,7 +45,8 @@ class ProductCrudController extends AbstractCrudController
                 ->setLabel('Prix (€)')
                 ->setCurrency('EUR')
                 ->setStoredAsCents(false)
-                ->setNumDecimals(2),
+                ->setNumDecimals(2)
+                ->setFormTypeOption('required', true),
 
             ChoiceField::new('unit')
                 ->setLabel('Unité')
@@ -71,16 +76,37 @@ class ProductCrudController extends AbstractCrudController
             };
         }),
 
-            IntegerField::new('inter')->hideOnIndex(),
+            NumberField::new('inter')
+                ->onlyOnForms()
+                ->setLabel('Intervalle (en grammes)')
+                ->setFormTypeOption('attr', [
+                    'step' => 0.1,
+                    'min' => 0,
+                ])
+                ->setFormTypeOption('html5', true)
+                ->setFormTypeOption('row_attr', ['class' => 'inter-wrapper']),
 
             BooleanField::new('hasStock')->hideOnIndex()->setLabel('Stock'),
 
-            IntegerField::new('stock')->onlyOnForms(),
+            IntegerField::new('stock')
+                ->onlyOnForms()
+                ->setFormTypeOption('attr', [
+                    'min' => 0,
+                ])
+                ->setFormTypeOption('row_attr', ['class' => 'stock-wrapper']),
+
+            BooleanField::new('limited')->setLabel('Qté Limitée'),
+
+            BooleanField::new('discount')
+                ->hideOnIndex()
+                ->setLabel('Promo'),
+
+            TextField::new('discountText')
+                ->onlyOnForms()
+                ->setLabel('Texte Promo')
+                ->setFormTypeOption('row_attr', ['class' => 'discountText-wrapper']),
 
             BooleanField::new('isDisplayed')->setLabel('Affiché'),
-            BooleanField::new('limited')->setLabel('Qté Limitée'),
-            BooleanField::new('discount')->hideOnIndex()->setLabel('Promo'),
-            TextField::new('discountText')->onlyOnForms()->setLabel('Text Promo'),
 
             ImageField::new('image')
                 ->setBasePath('/uploads/images')
@@ -102,4 +128,11 @@ class ProductCrudController extends AbstractCrudController
 
         return $product;
     }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets->addJsFile('js/admin/product-form.js');
+    }
+
+
 }
