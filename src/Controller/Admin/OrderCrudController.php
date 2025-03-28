@@ -5,26 +5,28 @@ namespace App\Controller\Admin;
 use App\Entity\Order;
 use App\Enum\PickupDay;
 use App\Enum\OrderStatus;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\OrderRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action};
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\{FieldCollection, FilterCollection};
 use EasyCorp\Bundle\EasyAdminBundle\Dto\{SearchDto, EntityDto};
-use EasyCorp\Bundle\EasyAdminBundle\Field\{DateTimeField,
+use EasyCorp\Bundle\EasyAdminBundle\Field\{
+    DateTimeField,
     ChoiceField,
     AssociationField,
     IdField,
     MoneyField,
-    TextField};
+    TextField
+};
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class OrderCrudController extends AbstractCrudController
 {
-    public function __construct(private EntityManagerInterface $entityManager) {}
+    public function __construct(private OrderRepository $orderRepository) {}
 
     public static function getEntityFqcn(): string
     {
@@ -35,7 +37,7 @@ class OrderCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id'),
-            DateTimeField::new('createdAt'),
+            DateTimeField::new('createdAt', 'Date de commande'),
             TextField::new('user.firstName', 'Prénom'),
             TextField::new('user.lastName', 'Nom'),
             MoneyField::new('total', 'Prix total')->setCurrency('EUR'),
@@ -53,7 +55,6 @@ class OrderCrudController extends AbstractCrudController
                     array_map(fn($v) => $v->name, OrderStatus::cases()),
                     OrderStatus::cases()
                 )),
-
         ];
     }
 
@@ -62,7 +63,7 @@ class OrderCrudController extends AbstractCrudController
         return $actions
             ->disable(Action::DELETE)
             ->addBatchAction(
-                Action::new('markDeleted', 'supprimer commande(s)')
+                Action::new('markDeleted', 'Supprimer commande(s)')
                     ->linkToCrudAction('markAsDeleted')
                     ->addCssClass('btn-danger')
             );
@@ -70,7 +71,6 @@ class OrderCrudController extends AbstractCrudController
 
     public function markAsDeleted(Request $request, AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
     {
-        // Récupération des IDs soumis dans la requête batch
         $entityIds = $request->request->all('batchActionEntityIds', []);
 
         if (empty($entityIds)) {
@@ -82,13 +82,13 @@ class OrderCrudController extends AbstractCrudController
             return $this->redirect($url);
         }
 
-        $orders = $this->entityManager->getRepository(Order::class)->findBy(['id' => $entityIds]);
+        $orders = $this->orderRepository->findBy(['id' => $entityIds]);
 
         foreach ($orders as $order) {
             $order->setIsDeleted(true);
         }
 
-        $this->entityManager->flush();
+        $this->orderRepository->flush();
 
         $this->addFlash('success', 'Commande(s) supprimée(s) !');
 
@@ -110,10 +110,6 @@ class OrderCrudController extends AbstractCrudController
         FieldCollection $fields,
         FilterCollection $filters
     ): QueryBuilder {
-        return $this->entityManager
-            ->getRepository(Order::class)
-            ->createQueryBuilder('o')
-            ->where('o.isDeleted = :deleted')
-            ->setParameter('deleted', false);
+        return $this->orderRepository->createNonDeletedQueryBuilder('o');
     }
 }
