@@ -31,6 +31,10 @@ class Order
     #[ORM\Column(enumType: OrderStatus::class)]
     private ?OrderStatus $status = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isDeleted = false;
+
+
     /**
      * @var Collection<int, ProductOrder>
      */
@@ -99,6 +103,19 @@ class Order
 
         return $this;
     }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
+
 
     /**
      * @return Collection<int, ProductOrder>
