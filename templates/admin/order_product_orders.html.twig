@@ -6,9 +6,9 @@
         <p>{{ order.createdAt|date('d/m/Y H:i') }}</p>
         <p><strong>Client :</strong> {{ order.user.firstName }} {{ order.user.lastName }}</p>
         <p><strong>Statut :</strong>
-            {% if order.status == constant('App\\Enum\\OrderStatus::PENDING') %}
+            {% if order.done == false %}
                 En attente
-            {% elseif order.status == constant('App\\Enum\\OrderStatus::DONE') %}
+            {% elseif order.done == true %}
                 Traitée
             {% else %}
                 {{ order.status }}

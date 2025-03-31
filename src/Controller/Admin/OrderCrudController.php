@@ -10,9 +10,11 @@ use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Crud, Filters};
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\{FieldCollection, FilterCollection};
 use EasyCorp\Bundle\EasyAdminBundle\Dto\{SearchDto, EntityDto};
-use EasyCorp\Bundle\EasyAdminBundle\Field\{CollectionField,
+use EasyCorp\Bundle\EasyAdminBundle\Field\{BooleanField,
+    CollectionField,
     DateTimeField,
     ChoiceField,
     AssociationField,
@@ -51,14 +53,7 @@ class OrderCrudController extends AbstractCrudController
                     default => $value,
                 }),
 
-            ChoiceField::new('status')
-                ->setLabel('Statut')
-                ->renderAsBadges()
-                ->formatValue(fn($value) => match($value) {
-                    \App\Enum\OrderStatus::PENDING => 'En attente',
-                    \App\Enum\OrderStatus::DONE => 'Traitée',
-                    default => $value,
-                }),
+            BooleanField::new('done', 'Traitée')->renderAsSwitch(true),
         ];
 
         if (Crud::PAGE_DETAIL === $pageName) {
@@ -95,12 +90,8 @@ class OrderCrudController extends AbstractCrudController
     {
         return $filters
             ->add(
-                ChoiceFilter::new('status')
-                    ->setLabel('Statut')
-                    ->setChoices([
-                        'En attente' => OrderStatus::PENDING,
-                        'Traitée' => OrderStatus::DONE,
-                    ])
+                BooleanFilter::new('done')
+                    ->setLabel('Traitée')
             )
             ->add(
                 ChoiceFilter::new('pickup')
@@ -118,34 +109,44 @@ class OrderCrudController extends AbstractCrudController
 
         if (empty($entityIds)) {
             $this->addFlash('warning', 'Aucune commande sélectionnée.');
-            $url = $adminUrlGenerator
-                ->setController(self::class)
-                ->setAction('index')
-                ->generateUrl();
-            return $this->redirect($url);
+            return $this->redirectBackToIndex($context, $adminUrlGenerator);
         }
 
         $orders = $this->orderRepository->findBy(['id' => $entityIds]);
 
+        $nonDeletable = [];
         foreach ($orders as $order) {
+            if (!$order->isDone()) {
+                $nonDeletable[] = $order->getId();
+                continue;
+            }
+
             $order->setIsDeleted(true);
         }
 
         $this->orderRepository->flush();
 
-        $this->addFlash('success', 'Commande(s) supprimée(s) !');
-
-        $referrer = $context->getReferrer();
-        if ($referrer) {
-            return $this->redirect($referrer);
+        if (!empty($nonDeletable)) {
+            $this->addFlash('warning', sprintf(
+                'Ces commandes n\'ont pas été supprimées car elles sont encore en attente : %s',
+                implode(', ', $nonDeletable)
+            ));
+        } else {
+            $this->addFlash('success', 'Commande(s) supprimée(s) !');
         }
 
-        $url = $adminUrlGenerator
+        return $this->redirectBackToIndex($context, $adminUrlGenerator);
+    }
+
+    private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
+    {
+        return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
             ->setController(self::class)
             ->setAction('index')
-            ->generateUrl();
-        return $this->redirect($url);
+            ->generateUrl());
     }
+
+
 
     public function createIndexQueryBuilder(
         SearchDto $searchDto,
