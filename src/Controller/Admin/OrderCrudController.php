@@ -8,18 +8,17 @@ use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Filters};
+use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Crud, Filters};
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\{FieldCollection, FilterCollection};
 use EasyCorp\Bundle\EasyAdminBundle\Dto\{SearchDto, EntityDto};
-use EasyCorp\Bundle\EasyAdminBundle\Field\{
+use EasyCorp\Bundle\EasyAdminBundle\Field\{CollectionField,
     DateTimeField,
     ChoiceField,
     AssociationField,
     IdField,
     MoneyField,
-    TextField
-};
+    TextField};
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -36,7 +35,7 @@ class OrderCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        return [
+        $fields = [
             IdField::new('id'),
             DateTimeField::new('createdAt', 'Date de commande'),
             TextField::new('user.firstName', 'Prénom'),
@@ -61,17 +60,35 @@ class OrderCrudController extends AbstractCrudController
                     default => $value,
                 }),
         ];
+
+        if (Crud::PAGE_DETAIL === $pageName) {
+            return [
+
+                CollectionField::new('productOrders',)
+                    ->onlyOnDetail()
+                    ->setLabel(false)
+                    ->setTemplatePath('admin/order_product_orders.html.twig'),
+            ];}
+
+
+
+            return $fields;
     }
 
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->disable(Action::DELETE)
+            ->disable(Action::DELETE, Action::NEW)
             ->addBatchAction(
                 Action::new('markDeleted', 'Supprimer commande(s)')
                     ->linkToCrudAction('markAsDeleted')
                     ->addCssClass('btn-danger')
-            );
+            )
+            ->add(Crud::PAGE_INDEX, Action::DETAIL) // on ajoute l'action détail
+            ->remove(Crud::PAGE_INDEX, Action::EDIT) // on supprime le bouton modifier
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
+        return $action->setLabel('Détails')->setIcon('fa fa-eye');
+    });
     }
 
     public function configureFilters(Filters $filters): Filters

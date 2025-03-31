@@ -1,62 +1,55 @@
-{# templates/admin/order_product_orders.html.twig #}
+{% set productOrders = field.value %}
+{% set order = productOrders|first ? productOrders|first.orderId : null %}
 
-<style>
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: Arial, sans-serif;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
+{% if order %}
+    <div class="mb-4 p-3 border rounded bg-light">
+        <p>{{ order.createdAt|date('d/m/Y H:i') }}</p>
+        <p><strong>Client :</strong> {{ order.user.firstName }} {{ order.user.lastName }}</p>
+        <p><strong>Statut :</strong>
+            {% if order.status == constant('App\\Enum\\OrderStatus::PENDING') %}
+                En attente
+            {% elseif order.status == constant('App\\Enum\\OrderStatus::DONE') %}
+                Traitée
+            {% else %}
+                {{ order.status }}
+            {% endif %}
+        </p>
+    </div>
+{% endif %}
 
-    .table th, .table td {
-        padding: 12px 15px;
-        text-align: left;
-    }
-
-    .table thead {
-        background-color: #4A90E2;
-        color: #ffffff;
-    }
-
-    .table tbody tr:nth-child(odd) {
-        background-color: #f4f7fc;
-    }
-
-    .table tbody tr:hover {
-        background-color: #e0ebf8;
-    }
-
-    .empty-message {
-        font-family: Arial, sans-serif;
-        color: #777;
-        padding: 10px;
-    }
-</style>
-
-{% if field.value is not empty %}
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Produit</th>
-            <th>Quantité</th>
-            <th>Prix unitaire</th>
-            {# Ajoutez d'autres colonnes selon vos besoins #}
-        </tr>
-        </thead>
-        <tbody>
-        {% for productOrder in field.value %}
+{% if productOrders is not empty %}
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered align-middle">
+            <thead class="table-primary">
             <tr>
-                <td>{{ productOrder.product.name }}</td>
-                <td>{{ productOrder.quantity }}</td>
-                <td>{{ productOrder.product.getPriceInEuros() }}</td>
-                {# Exemple de colonne supplémentaire :
-                    <td>{{ productOrder.getLineTotal() }}</td>
-                #}
+                <th scope="col">Produit</th>
+                <th scope="col">Quantité</th>
+                <th scope="col">Prix unitaire (€)</th>
+                <th scope="col">Total ligne (€)</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% set total = 0 %}
+            {% for item in productOrders %}
+                {% set unit = item.unitPrice / 100 %}
+                {% set lineTotal = unit * item.quantity %}
+                {% set total = total + lineTotal %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ unit|number_format(2, ',', ' ') }}</td>
+                    <td>{{ lineTotal|number_format(2, ',', ' ') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+            <tr class="fw-bold">
+                <td colspan="3" class="text-end">Total :</td>
+                <td>{{ total|number_format(2, ',', ' ') }} €</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
 {% else %}
-    <p class="empty-message">Aucun produit commandé</p>
+    <p class="text-muted fst-italic">Aucun produit commandé</p>
 {% endif %}
