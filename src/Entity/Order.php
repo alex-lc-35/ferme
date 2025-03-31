@@ -28,8 +28,12 @@ class Order
     #[ORM\Column(enumType: PickupDay::class)]
     private ?PickupDay $pickup = null;
 
-    #[ORM\Column(enumType: OrderStatus::class)]
-    private ?OrderStatus $status = null;
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $done = false;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isDeleted = false;
+
 
     /**
      * @var Collection<int, ProductOrder>
@@ -88,17 +92,29 @@ class Order
         return $this;
     }
 
-    public function getStatus(): ?OrderStatus
+    public function isDone(): bool
     {
-        return $this->status;
+        return $this->done;
     }
 
-    public function setStatus(OrderStatus $status): static
+    public function setDone(bool $done): static
     {
-        $this->status = $status;
+        $this->done = $done;
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, ProductOrder>
