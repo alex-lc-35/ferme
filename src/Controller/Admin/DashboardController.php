@@ -48,7 +48,9 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Produits', 'fas fa-apple-alt', Product::class);
-        yield MenuItem::linkToCrud('Commandes', 'fas fa-box', Order::class);    }
+        yield MenuItem::linkToCrud('Commandes', 'fas fa-box', Order::class);
+        yield MenuItem::linkToRoute('Tableau commandes', 'fa fa-table', 'admin_product_client_tab');
+    }
 
 
 }
