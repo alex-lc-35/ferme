@@ -6,6 +6,7 @@ use App\Entity\Order;
 use App\Enum\PickupDay;
 use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Crud, Filters};
@@ -103,8 +104,12 @@ class OrderCrudController extends AbstractCrudController
             );
     }
 
-    public function markAsDeleted(Request $request, AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
-    {
+    public function markAsDeleted(
+        Request $request,
+        AdminContext $context,
+        AdminUrlGenerator $adminUrlGenerator,
+        EntityManagerInterface $entityManager // on l'injecte ici
+    ): RedirectResponse {
         $entityIds = $request->request->all('batchActionEntityIds', []);
 
         if (empty($entityIds)) {
@@ -115,6 +120,7 @@ class OrderCrudController extends AbstractCrudController
         $orders = $this->orderRepository->findBy(['id' => $entityIds]);
 
         $nonDeletable = [];
+
         foreach ($orders as $order) {
             if (!$order->isDone()) {
                 $nonDeletable[] = $order->getId();
@@ -124,7 +130,7 @@ class OrderCrudController extends AbstractCrudController
             $order->setIsDeleted(true);
         }
 
-        $this->orderRepository->flush();
+        $entityManager->flush(); // méthode Doctrine officielle & propre
 
         if (!empty($nonDeletable)) {
             $this->addFlash('warning', sprintf(
@@ -138,6 +144,7 @@ class OrderCrudController extends AbstractCrudController
         return $this->redirectBackToIndex($context, $adminUrlGenerator);
     }
 
+
     private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
     {
         return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
@@ -146,22 +153,5 @@ class OrderCrudController extends AbstractCrudController
             ->generateUrl());
     }
 
-
-
-    public function createIndexQueryBuilder(
-        SearchDto $searchDto,
-        EntityDto $entityDto,
-        FieldCollection $fields,
-        FilterCollection $filters
-    ): QueryBuilder {
-        // On récupère le QueryBuilder EasyAdmin de base
-        $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
-
-        // On ajoute notre condition personnalisée
-        $qb->andWhere('entity.isDeleted = :deleted')
-            ->setParameter('deleted', false);
-
-        return $qb;
-    }
 
 }
