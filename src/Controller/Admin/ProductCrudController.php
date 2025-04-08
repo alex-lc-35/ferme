@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\Product;
 use App\Enum\ProductUnit;
+use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -19,6 +21,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+
 class ProductCrudController extends AbstractCrudController
 {
     private Security $security;
@@ -142,9 +148,70 @@ class ProductCrudController extends AbstractCrudController
 
         return $actions
             ->add(Crud::PAGE_NEW, $returnAction)
-            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $a) => $a->setLabel('Ajouter un produit'));
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $a) => $a->setLabel('Ajouter un produit'))
+            ->disable(Action::DELETE)
+            ->addBatchAction(
+                Action::new('markDeleted', 'Supprimer produit(s)')
+                    ->linkToCrudAction('markAsDeleted')
+                    ->addCssClass('btn-danger')
+            )
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
 
     }
 
+    public function markAsDeleted(
+        Request $request,
+        AdminContext $context,
+        AdminUrlGenerator $adminUrlGenerator,
+        EntityManagerInterface $entityManager
+    ): RedirectResponse {
+        $entityIds = $request->request->all('batchActionEntityIds', []);
+
+        if (empty($entityIds)) {
+            $this->addFlash('warning', 'Aucun produit sélectionné.');
+            return $this->redirectBackToIndex($context, $adminUrlGenerator);
+        }
+
+        $productRepository = $entityManager->getRepository(Product::class);
+        $products = $productRepository->findBy(['id' => $entityIds]);
+
+        $filters = $entityManager->getFilters();
+        if ($filters->isEnabled('soft_delete')) {
+            $filters->disable('soft_delete');
+        }
+
+        $nonDeletable = [];
+
+        foreach ($products as $product) {
+            if ($product->getNonDeletedProductOrders()->count() > 0) {
+                $nonDeletable[] = $product->getName();
+                continue;
+            }
+
+            $product->setIsDeleted(true);
+        }
+
+        $filters->enable('soft_delete');
+        $entityManager->flush();
+
+        if (!empty($nonDeletable)) {
+            $this->addFlash('warning', sprintf(
+                'Les produits suivants n\'ont pas été supprimés car ils sont liés à des commandes : %s',
+                implode(', ', $nonDeletable)
+            ));
+        } else {
+            $this->addFlash('success', 'Produit(s) supprimé(s) !');
+        }
+
+        return $this->redirectBackToIndex($context, $adminUrlGenerator);
+    }
+
+    private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
+    {
+        return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
+            ->setController(self::class)
+            ->setAction('index')
+            ->generateUrl());
+    }
 
 }

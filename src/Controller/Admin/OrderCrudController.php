@@ -4,10 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\Order;
 use App\Enum\PickupDay;
-use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Crud, Filters};
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -18,7 +16,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{BooleanField,
     CollectionField,
     DateTimeField,
     ChoiceField,
-    AssociationField,
     IdField,
     MoneyField,
     TextField};

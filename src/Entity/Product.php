@@ -248,6 +248,17 @@ class Product
     }
 
 
+    /**
+     *
+     * @return Collection<int, ProductOrder>
+     */
+    public function getNonDeletedProductOrders(): Collection
+    {
+        return $this->productOrders->filter(function (ProductOrder $productOrder) {
+            $order = $productOrder->getOrderId();
+            return $order !== null && !$order->isDeleted();
+        });
+    }
 
     /**
      * @return Collection<int, ProductOrder>
