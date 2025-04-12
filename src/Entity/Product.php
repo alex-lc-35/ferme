@@ -49,6 +49,9 @@ class Product
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isDeleted = false;
+
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
@@ -230,6 +233,31 @@ class Product
         $this->user = $user;
 
         return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
+
+
+    /**
+     *
+     * @return Collection<int, ProductOrder>
+     */
+    public function getNonDeletedProductOrders(): Collection
+    {
+        return $this->productOrders->filter(function (ProductOrder $productOrder) {
+            $order = $productOrder->getOrderId();
+            return $order !== null && !$order->isDeleted();
+        });
     }
 
     /**

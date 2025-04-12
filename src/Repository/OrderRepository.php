@@ -18,14 +18,4 @@ class OrderRepository extends ServiceEntityRepository
     }
 
 
-    public function createNonDeletedQueryBuilder(string $alias = 'o'): QueryBuilder
-    {
-        return $this->createQueryBuilder($alias)
-            ->where("$alias.isDeleted = :val")
-            ->setParameter('val', false);
-    }
-    public function flush(): void
-    {
-        $this->getEntityManager()->flush();    }
-
 }
