@@ -88,7 +88,7 @@ class ProductCrudController extends AbstractCrudController
                 ->onlyOnForms()
                 ->setLabel('Intervalle (en grammes)')
                 ->setFormTypeOption('attr', [
-                    'step' => 0.1,
+                    'step' => 0.01,
                     'min' => 0,
                 ])
                 ->setFormTypeOption('html5', true)
@@ -119,7 +119,10 @@ class ProductCrudController extends AbstractCrudController
             ImageField::new('image')
                 ->setBasePath('/uploads/images')
                 ->setUploadDir('public/uploads/images')
-                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]'),
+                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+                ->setFormTypeOptions([
+                    'required' => Crud::PAGE_NEW === $pageName,
+                ]),
 
             AssociationField::new('user')
                 ->hideOnForm()
@@ -147,7 +150,6 @@ class ProductCrudController extends AbstractCrudController
             ->linkToUrl('/admin/product');
 
         return $actions
-            ->add(Crud::PAGE_NEW, $returnAction)
             ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $a) => $a->setLabel('Ajouter un produit'))
             ->disable(Action::DELETE)
             ->addBatchAction(
@@ -155,7 +157,10 @@ class ProductCrudController extends AbstractCrudController
                     ->linkToCrudAction('markAsDeleted')
                     ->addCssClass('btn-danger')
             )
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_NEW, $returnAction)
+            ->add(Crud::PAGE_EDIT, $returnAction)
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE);
 
     }
 
