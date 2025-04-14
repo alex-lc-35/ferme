@@ -80,4 +80,8 @@ class Message
 
         return $this;
     }
+    public function getIsActiveLabel(): string
+    {
+        return $this->isActive ? '✅ Oui' : '❌ Non';
+    }
 }
