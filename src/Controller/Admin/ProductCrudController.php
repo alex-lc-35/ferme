@@ -40,6 +40,14 @@ class ProductCrudController extends AbstractCrudController
     }
 
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('Produit 🥕')
+            ->setEntityLabelInPlural('Produits 🥕')
+            ->setPageTitle(Crud::PAGE_INDEX, 'Produits 🥕');
+    }
+
     public function configureFields(string $pageName): iterable
     {
         return [
