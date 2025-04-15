@@ -39,13 +39,22 @@ class ProductCrudController extends AbstractCrudController
         return Product::class;
     }
 
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            ->addJsFile('js/admin/product-form.js')
+            ->addCssFile('css/admin/custom.css');
+    }
+
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Produit 🥕')
-            ->setEntityLabelInPlural('Produits 🥕')
-            ->setPageTitle(Crud::PAGE_INDEX, 'Produits 🥕');
+            ->setEntityLabelInSingular('🥕 Produit')
+            ->setEntityLabelInPlural('🥕 Produits')
+            ->setPageTitle(Crud::PAGE_INDEX, '🥕 Produits')
+            ->setPaginatorPageSize(10)
+            ->setDefaultSort(['updatedAt' => 'DESC']);
     }
 
     public function configureFields(string $pageName): iterable
@@ -102,7 +111,10 @@ class ProductCrudController extends AbstractCrudController
                 ->setFormTypeOption('html5', true)
                 ->setFormTypeOption('row_attr', ['class' => 'inter-wrapper']),
 
-            BooleanField::new('hasStock')->hideOnIndex()->setLabel('Stock'),
+            BooleanField::new('hasStock')
+                ->hideOnIndex()
+                ->setLabel('Stock')
+                ->setFormTypeOption('row_attr', ['class' => 'has-stock-wrapper flex-stock-row']),
 
             IntegerField::new('stock')
                 ->onlyOnForms()
@@ -130,7 +142,8 @@ class ProductCrudController extends AbstractCrudController
                 ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
                 ->setFormTypeOptions([
                     'required' => Crud::PAGE_NEW === $pageName,
-                ]),
+                ])
+                ->addCssClass('avatar-image'),
 
             AssociationField::new('user')
                 ->hideOnForm()
@@ -147,10 +160,6 @@ class ProductCrudController extends AbstractCrudController
         return $product;
     }
 
-    public function configureAssets(Assets $assets): Assets
-    {
-        return $assets->addJsFile('js/admin/product-form.js');
-    }
 
     public function configureActions(Actions $actions): Actions
     {
