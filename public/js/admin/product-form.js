@@ -7,15 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const interWrapper = document.querySelector('.inter-wrapper');
     const selectElement = document.querySelector('select[name$="[unit]"]');
 
-    if (!tsControl) {
-        console.error("Le widget ts-control est introuvable.");
-    }
-    if (!interWrapper) {
-        console.error("Le conteneur inter-wrapper est introuvable.");
-    }
-    if (!selectElement) {
-        console.error("Le select unit est introuvable.");
-    }
 
     // Fonction pour afficher/masquer le conteneur "inter"
     function toggleInterField() {
@@ -27,41 +18,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (tsControl && selectElement) {
-        // Écoute l'événement "click" sur le widget Tomselected pour capter l'interaction
-        tsControl.addEventListener('click', () => {
-            setTimeout(toggleInterField, 100);
-        });
-        // Écoute également le changement sur le select caché
+        tsControl.addEventListener('click', () => setTimeout(toggleInterField, 100));
         selectElement.addEventListener('change', toggleInterField);
-        // Applique l'état initial dès le chargement
         toggleInterField();
     }
 
     // --- Gestion du champ "stock" ---
-    // Sélectionne le conteneur stock et le checkbox "hasStock"
-    const stockWrapper = document.querySelector('.stock-wrapper');
+    const hasStockWrapper = document.querySelector('.has-stock-wrapper');
     const hasStockCheckbox = document.querySelector('input[name$="[hasStock]"]');
+    const stockWrapper = document.querySelector('.stock-wrapper');
 
-    if (!stockWrapper) {
-        console.error("Le conteneur stock-wrapper est introuvable.");
-    }
-    if (!hasStockCheckbox) {
-        console.error("Le checkbox hasStock est introuvable.");
-    }
+    if (hasStockWrapper && hasStockCheckbox && stockWrapper) {
+        const stockWidget = stockWrapper.querySelector('.form-widget');
+        const stockLabel = stockWrapper.querySelector('label');
 
-    // Fonction pour afficher/masquer le conteneur "stock"
-    function toggleStockField() {
-        // Affiche le conteneur si le checkbox est coché, sinon le masque
-        stockWrapper.style.display = hasStockCheckbox.checked ? 'block' : 'none';
-    }
+        // Crée un wrapper pour tout déplacer ensemble dans le champ du switch
+        const inlineGroup = document.createElement('div');
+        inlineGroup.classList.add('stock-inline-group');
+        inlineGroup.style.display = 'flex';
+        inlineGroup.style.alignItems = 'center';
+        inlineGroup.style.gap = '1rem';
+        inlineGroup.style.marginTop = '0.5rem';
 
-    if (hasStockCheckbox) {
+        if (stockLabel) {
+            stockLabel.style.margin = '0';
+            inlineGroup.appendChild(stockLabel);
+        }
+
+        if (stockWidget) {
+            stockWidget.style.margin = '0';
+            inlineGroup.appendChild(stockWidget);
+        }
+
+        hasStockWrapper.appendChild(inlineGroup);
+        stockWrapper.style.display = 'none'; // cache l'ancien wrapper
+
+        function toggleStockField() {
+            inlineGroup.style.display = hasStockCheckbox.checked ? 'flex' : 'none';
+        }
+
         hasStockCheckbox.addEventListener('change', toggleStockField);
-        // Applique l'état initial dès le chargement
         toggleStockField();
     }
-// --- Gestion du champ "Texte Promo" ---
-    // Le champ "Texte Promo" s'affichera uniquement si le champ "Promo" est coché.
+
+
+    // --- Gestion du champ "Texte Promo" ---
     const discountCheckbox = document.querySelector('input[name$="[discount]"]');
     const discountTextWrapper = document.querySelector('.discountText-wrapper');
 
@@ -71,8 +72,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         discountCheckbox.addEventListener('change', toggleDiscountTextField);
         toggleDiscountTextField();
-    } else {
-        if (!discountCheckbox) console.error("Le checkbox discount est introuvable.");
-        if (!discountTextWrapper) console.error("Le conteneur discountText-wrapper est introuvable.");
     }
 });
