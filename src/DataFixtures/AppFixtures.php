@@ -88,7 +88,6 @@ class AppFixtures extends Fixture
                 $order->setTotal(0); // Le total sera calculé plus tard
                 $order->setCreatedAt(new \DateTimeImmutable());
                 $order->setPickup($faker->randomElement([PickupDay::TUESDAY, PickupDay::THURSDAY]));
-                $order->setStatus($faker->randomElement([OrderStatus::PENDING, OrderStatus::DONE]));
                 $manager->persist($order);
 
                 // Ajout de produits à la commande

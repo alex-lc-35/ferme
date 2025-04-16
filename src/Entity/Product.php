@@ -7,6 +7,8 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -51,6 +53,13 @@ class Product
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isDeleted = false;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
@@ -247,6 +256,39 @@ class Product
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+
+    #[Assert\Callback]
+    public function validateStockRequirement(ExecutionContextInterface $context): void
+    {
+        if ($this->hasStock && ($this->stock === null || $this->stock < 0)) {
+            $context->buildViolation('Le stock est requis ')
+                ->atPath('stock')
+                ->addViolation();
+        }
+    }
 
     /**
      *

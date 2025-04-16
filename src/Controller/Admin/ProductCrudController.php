@@ -39,6 +39,23 @@ class ProductCrudController extends AbstractCrudController
         return Product::class;
     }
 
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            ->addJsFile('js/admin/product-form.js')
+            ->addCssFile('css/admin/custom.css');
+    }
+
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('🥕 Produit')
+            ->setEntityLabelInPlural('🥕 Produits')
+            ->setPageTitle(Crud::PAGE_INDEX, '🥕 Produits')
+            ->setPaginatorPageSize(10)
+            ->setDefaultSort(['updatedAt' => 'DESC']);
+    }
 
     public function configureFields(string $pageName): iterable
     {
@@ -88,13 +105,16 @@ class ProductCrudController extends AbstractCrudController
                 ->onlyOnForms()
                 ->setLabel('Intervalle (en grammes)')
                 ->setFormTypeOption('attr', [
-                    'step' => 0.1,
+                    'step' => 0.01,
                     'min' => 0,
                 ])
                 ->setFormTypeOption('html5', true)
                 ->setFormTypeOption('row_attr', ['class' => 'inter-wrapper']),
 
-            BooleanField::new('hasStock')->hideOnIndex()->setLabel('Stock'),
+            BooleanField::new('hasStock')
+                ->hideOnIndex()
+                ->setLabel('Stock')
+                ->setFormTypeOption('row_attr', ['class' => 'has-stock-wrapper flex-stock-row']),
 
             IntegerField::new('stock')
                 ->onlyOnForms()
@@ -119,7 +139,11 @@ class ProductCrudController extends AbstractCrudController
             ImageField::new('image')
                 ->setBasePath('/uploads/images')
                 ->setUploadDir('public/uploads/images')
-                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]'),
+                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+                ->setFormTypeOptions([
+                    'required' => Crud::PAGE_NEW === $pageName,
+                ])
+                ->addCssClass('avatar-image'),
 
             AssociationField::new('user')
                 ->hideOnForm()
@@ -136,10 +160,6 @@ class ProductCrudController extends AbstractCrudController
         return $product;
     }
 
-    public function configureAssets(Assets $assets): Assets
-    {
-        return $assets->addJsFile('js/admin/product-form.js');
-    }
 
     public function configureActions(Actions $actions): Actions
     {
@@ -147,7 +167,6 @@ class ProductCrudController extends AbstractCrudController
             ->linkToUrl('/admin/product');
 
         return $actions
-            ->add(Crud::PAGE_NEW, $returnAction)
             ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $a) => $a->setLabel('Ajouter un produit'))
             ->disable(Action::DELETE)
             ->addBatchAction(
@@ -155,7 +174,10 @@ class ProductCrudController extends AbstractCrudController
                     ->linkToCrudAction('markAsDeleted')
                     ->addCssClass('btn-danger')
             )
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->add(Crud::PAGE_NEW, $returnAction)
+            ->add(Crud::PAGE_EDIT, $returnAction)
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE);
 
     }
 
