@@ -6,6 +6,8 @@ use App\Entity\Message;
 use App\Enum\MessageType;
 use App\Service\MessageService;
 use Doctrine\ORM\EntityManagerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\{
     BooleanField,
@@ -15,6 +17,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\{
 };
 use Symfony\Bundle\SecurityBundle\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+
+
 class MessageCrudController extends AbstractCrudController
 {
     public function __construct(
@@ -31,8 +35,8 @@ class MessageCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setEntityLabelInSingular('Message')
-            ->setEntityLabelInPlural('Messages')
+            ->setEntityLabelInSingular('💬 Message')
+            ->setEntityLabelInPlural('💬 Messages')
             ->setDefaultSort(['type' => 'ASC']);
     }
 
@@ -73,6 +77,19 @@ class MessageCrudController extends AbstractCrudController
         }
 
         return $fields;
+    }
+
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $returnAction = Action::new('Retour')
+            ->linkToUrl('/admin/message');
+
+        return $actions
+            ->add(Crud::PAGE_NEW, $returnAction)
+            ->add(Crud::PAGE_EDIT, $returnAction)
+            ->remove(Crud::PAGE_NEW, Action::SAVE_AND_ADD_ANOTHER)
+            ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE);
     }
 
     public function createEntity(string $entityFqcn): Message
