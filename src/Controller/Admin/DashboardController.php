@@ -23,8 +23,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('Ferme De La Rougeraie ');
-    }
+            ->setTitle('<img src="/images/logo.png" alt="Ferme De La Rougeraie" height="100">');    }
 
     public function configureMenuItems(): iterable
     {

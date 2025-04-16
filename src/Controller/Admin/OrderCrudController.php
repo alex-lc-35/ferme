@@ -33,6 +33,13 @@ class OrderCrudController extends AbstractCrudController
         return Order::class;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInSingular('📦 Commande')
+            ->setEntityLabelInPlural('📦 Commandes');
+    }
+
     public function configureFields(string $pageName): iterable
     {
         $fields = [
