@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Attribute\AutoTitleCase;
 use App\Enum\ProductUnit;
 use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\EntityListeners(['App\EventListener\TitleCaseListener'])]
 class Product
 {
     #[ORM\Id]
@@ -19,6 +21,7 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[AutoTitleCase]
     private ?string $name = null;
 
     #[ORM\Column]

@@ -64,6 +64,15 @@ class ProductCrudController extends AbstractCrudController
                 ->hideOnForm()
                 ->hideOnIndex(),
 
+            ImageField::new('image')
+                ->setBasePath('/uploads/images')
+                ->setUploadDir('public/uploads/images')
+                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+                ->setFormTypeOptions([
+                    'required' => Crud::PAGE_NEW === $pageName,
+                ])
+                ->addCssClass('avatar-image'),
+
             TextField::new('name')->setLabel('Nom'),
 
             MoneyField::new('priceInEuros')
@@ -103,7 +112,7 @@ class ProductCrudController extends AbstractCrudController
 
             NumberField::new('inter')
                 ->onlyOnForms()
-                ->setLabel('Intervalle (en grammes)')
+                ->setLabel('Intervalle (en kg)')
                 ->setFormTypeOption('attr', [
                     'step' => 0.01,
                     'min' => 0,
@@ -136,14 +145,6 @@ class ProductCrudController extends AbstractCrudController
 
             BooleanField::new('isDisplayed')->setLabel('Affiché'),
 
-            ImageField::new('image')
-                ->setBasePath('/uploads/images')
-                ->setUploadDir('public/uploads/images')
-                ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
-                ->setFormTypeOptions([
-                    'required' => Crud::PAGE_NEW === $pageName,
-                ])
-                ->addCssClass('avatar-image'),
 
             AssociationField::new('user')
                 ->hideOnForm()
@@ -174,7 +175,6 @@ class ProductCrudController extends AbstractCrudController
                     ->linkToCrudAction('markAsDeleted')
                     ->addCssClass('btn-danger')
             )
-            ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_NEW, $returnAction)
             ->add(Crud::PAGE_EDIT, $returnAction)
             ->remove(Crud::PAGE_EDIT, Action::SAVE_AND_CONTINUE);
