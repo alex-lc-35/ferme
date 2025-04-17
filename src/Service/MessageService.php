@@ -20,19 +20,17 @@ class MessageService
 
     public function disableOtherMessages(Message $current): void
     {
-        $qb = $this->messageRepository->createQueryBuilder('m')
-            ->where('m.type = :type')
-            ->andWhere('m.id != :id')
-            ->andWhere('m.isActive = true')
-            ->setParameter('type', $current->getType())
-            ->setParameter('id', $current->getId() ?? 0);
+        $id = $current->getId() ?? 0;
 
-        $others = $qb->getQuery()->getResult();
+        $others = $this->messageRepository->findOtherActiveMessagesByType(
+            $current->getType(),
+            $id
+        );
 
         foreach ($others as $other) {
             $other->setIsActive(false);
             $this->em->persist($other);
         }
-    }
 
+    }
 }
