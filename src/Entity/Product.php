@@ -283,28 +283,6 @@ class Product
     }
 
 
-    #[Assert\Callback]
-    public function validateStockRequirement(ExecutionContextInterface $context): void
-    {
-        if ($this->hasStock && ($this->stock === null || $this->stock < 0)) {
-            $context->buildViolation('Le stock est requis ')
-                ->atPath('stock')
-                ->addViolation();
-        }
-    }
-
-    /**
-     *
-     * @return Collection<int, ProductOrder>
-     */
-    public function getNonDeletedProductOrders(): Collection
-    {
-        return $this->productOrders->filter(function (ProductOrder $productOrder) {
-            $order = $productOrder->getOrderId();
-            return $order !== null && !$order->isDeleted();
-        });
-    }
-
     /**
      * @return Collection<int, ProductOrder>
      */
@@ -333,6 +311,16 @@ class Product
         }
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateStockRequirement(ExecutionContextInterface $context): void
+    {
+        if ($this->hasStock && ($this->stock === null || $this->stock < 0)) {
+            $context->buildViolation('Le stock est requis ')
+                ->atPath('stock')
+                ->addViolation();
+        }
     }
 
 }
