@@ -32,6 +32,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Commandes', 'fas fa-box', Order::class);
         yield MenuItem::linkToRoute('Tableau commandes', 'fa-solid fa-table-list', 'admin_product_client_tab');
         yield MenuItem::linkToCrud('Messages', 'fas fa-comment', Message::class);
+        yield MenuItem::linkToRoute('Utilisateurs', 'fa-solid fa-users', 'admin_user_list_tab');
     }
-
 }
