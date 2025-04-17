@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Product;
 use App\Enum\ProductUnit;
+use App\Service\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -18,20 +19,19 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Bundle\SecurityBundle\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Crud, Filters};
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 class ProductCrudController extends AbstractCrudController
 {
     private Security $security;
+    private ProductService $productService;
 
-    public function __construct(Security $security)
-    {
+    public function __construct(Security $security, ProductService $productService)    {
         $this->security = $security;
+        $this->productService = $productService;
     }
 
     public static function getEntityFqcn(): string
@@ -181,11 +181,31 @@ class ProductCrudController extends AbstractCrudController
 
     }
 
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(
+                ChoiceFilter::new('isDisplayed')
+                    ->setLabel('Affiché')
+                    ->setChoices([
+                        'Affiché'      => true,
+                        'Non affiché'  => false,
+                    ])
+            );
+    }
+
+    private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
+    {
+        return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
+            ->setController(self::class)
+            ->setAction('index')
+            ->generateUrl());
+    }
+
     public function markAsDeleted(
         Request $request,
         AdminContext $context,
-        AdminUrlGenerator $adminUrlGenerator,
-        EntityManagerInterface $entityManager
+        AdminUrlGenerator $adminUrlGenerator
     ): RedirectResponse {
         $entityIds = $request->request->all('batchActionEntityIds', []);
 
@@ -194,27 +214,7 @@ class ProductCrudController extends AbstractCrudController
             return $this->redirectBackToIndex($context, $adminUrlGenerator);
         }
 
-        $productRepository = $entityManager->getRepository(Product::class);
-        $products = $productRepository->findBy(['id' => $entityIds]);
-
-        $filters = $entityManager->getFilters();
-        if ($filters->isEnabled('soft_delete')) {
-            $filters->disable('soft_delete');
-        }
-
-        $nonDeletable = [];
-
-        foreach ($products as $product) {
-            if ($product->getNonDeletedProductOrders()->count() > 0) {
-                $nonDeletable[] = $product->getName();
-                continue;
-            }
-
-            $product->setIsDeleted(true);
-        }
-
-        $filters->enable('soft_delete');
-        $entityManager->flush();
+        $nonDeletable = $this->productService->markProductsAsDeletedByIds($entityIds);
 
         if (!empty($nonDeletable)) {
             $this->addFlash('warning', sprintf(
@@ -228,12 +228,5 @@ class ProductCrudController extends AbstractCrudController
         return $this->redirectBackToIndex($context, $adminUrlGenerator);
     }
 
-    private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
-    {
-        return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
-            ->setController(self::class)
-            ->setAction('index')
-            ->generateUrl());
-    }
 
 }
