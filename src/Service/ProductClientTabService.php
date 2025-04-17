@@ -2,55 +2,38 @@
 
 namespace App\Service;
 
-use App\Entity\User;
-use App\Entity\Product;
+use App\Repository\ProductOrderRepository;
+use App\Repository\ProductRepository;
+use App\Repository\UserRepository;
 
 class ProductClientTabService
 {
-    /**
-     * Calcule le tableau associatif des quantités commandées
-     * pour chaque utilisateur et chaque produit.
-     *
-     * @param User[]    $users    Liste des utilisateurs
-     * @param Product[] $products Liste des produits
-     *
-     * @return array Renvoie un tableau sous la forme :
-     *               [
-     *                  userId => [
-     *                      productId => totalQuantity,
-     *                  ],
-     *               ]
-     */
-    public function calculateQuantities(array $users, array $products): array
+    public function __construct(
+        private ProductOrderRepository $productOrderRepository,
+        private ProductRepository $productRepository,
+        private UserRepository $userRepository
+    ) {}
+
+    public function getProductClientQuantities(): array
     {
-        $quantitiesTab = [];
+        $products = $this->productRepository->findProductsWithOrderedQuantities();
 
-        foreach ($users as $user) {
-            $userRow = [];
+        $rawQuantities = $this->productOrderRepository->getUserProductQuantities();
 
-            foreach ($products as $product) {
-                $totalQty = 0;
+        $quantitiesTab = $this->buildQuantitiesTab($rawQuantities);
 
-                foreach ($user->getOrders() as $order) {
-                    if ($order->isDeleted()) {
-                        continue;
-                    }
+        $userIds = array_keys($quantitiesTab);
+        $users = $this->userRepository->findUsersByIds($userIds);
 
-                    foreach ($order->getProductOrders() as $productOrder) {
-                        if ($productOrder->getProduct()->getId() === $product->getId()) {
-                            $totalQty += $productOrder->getQuantity();
-                        }
-                    }
-                }
+        return [$products, $users, $quantitiesTab];
+    }
 
-                // Affecte la quantité totale pour ce produit à l'utilisateur
-                $userRow[$product->getId()] = $totalQty;
-            }
-
-            // Place le tableau des quantités pour l'utilisateur identifié par son id
-            $quantitiesTab[$user->getId()] = $userRow;
+    private function buildQuantitiesTab(array $rawData): array
+    {
+        $tab = [];
+        foreach ($rawData as $row) {
+            $tab[$row['userId']][$row['productId']] = (int) $row['totalQuantity'];
         }
-
-        return $quantitiesTab;
+        return $tab;
     }
 }

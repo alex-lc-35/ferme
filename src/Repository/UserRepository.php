@@ -35,20 +35,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
 
     /**
-     * Récupère les utilisateurs ayant passé au moins une commande non supprimée.
-     *
-     * @return User[] Renvoie un tableau d'entités User
-     */
-    public function findUsersWithNonDeletedOrders(): array
-    {
-        return $this->createQueryBuilder('u')
-            ->join('u.orders', 'o')
-            ->andWhere('o.isDeleted = false')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * Récupère les utilisateurs role : ROLE_USER .
      *
      * @return User[] Renvoie un tableau d'entités User
@@ -59,6 +45,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->createQueryBuilder('u')
             ->where('u.roles NOT LIKE :adminRole')
             ->setParameter('adminRole', '%ROLE_ADMIN%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findUsersByIds(array $userIds): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.id IN (:ids)')
+            ->setParameter('ids', $userIds)
+            ->orderBy('u.lastName', 'ASC')
             ->getQuery()
             ->getResult();
     }
