@@ -4,19 +4,14 @@ namespace App\Controller\Admin;
 
 use App\Entity\Message;
 use App\Enum\MessageType;
-use App\Service\MessageService;
+use App\Service\Admin\MessageService;
 use Doctrine\ORM\EntityManagerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\{
-    BooleanField,
-    ChoiceField,
-    TextareaField,
-    TextField,
-};
-use Symfony\Bundle\SecurityBundle\Security;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\{BooleanField, ChoiceField, TextareaField, TextField,};
+use Symfony\Bundle\SecurityBundle\Security;
 
 
 class MessageCrudController extends AbstractCrudController

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Admin;
 
-use App\Repository\ProductOrderRepository;
-use App\Repository\ProductRepository;
-use App\Repository\UserRepository;
+use App\Repository\Admin\ProductOrderRepository;
+use App\Repository\Admin\ProductRepository;
+use App\Repository\Admin\UserRepository;
 
 class ProductClientTabService
 {

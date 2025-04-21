@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\MessageType;
-use App\Repository\MessageRepository;
+use App\Repository\Admin\MessageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

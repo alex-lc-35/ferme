@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Admin;
 
 use App\Entity\Message;
+use App\Enum\MessageType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Enum\MessageType;
 
 class MessageRepository extends ServiceEntityRepository
 {
