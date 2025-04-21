@@ -14,10 +14,6 @@ class OrderMapper
         foreach ($order->getProductOrders() as $po) {
             $product = $po->getProduct();
 
-            if (!$product) {
-                continue;
-            }
-
             $items[] = [
                 'productId' => $product->getId(),
                 'productName' => $product->getName(),
