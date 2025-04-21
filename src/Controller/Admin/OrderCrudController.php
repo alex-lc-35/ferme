@@ -4,14 +4,11 @@ namespace App\Controller\Admin;
 
 use App\Entity\Order;
 use App\Enum\PickupDay;
-use App\Repository\OrderRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\OrderService;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Actions, Action, Crud, Filters};
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\{FieldCollection, FilterCollection};
-use EasyCorp\Bundle\EasyAdminBundle\Dto\{SearchDto, EntityDto};
 use EasyCorp\Bundle\EasyAdminBundle\Field\{BooleanField,
     CollectionField,
     DateTimeField,
@@ -25,10 +22,17 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class OrderCrudController extends AbstractCrudController
-{
-    public function __construct(private OrderRepository $orderRepository) {}
 
-    public static function getEntityFqcn(): string
+{
+
+    private OrderService $orderService;
+
+    public function __construct( OrderService $orderService)    {
+        $this->orderService = $orderService;
+
+    }
+
+        public static function getEntityFqcn(): string
     {
         return Order::class;
     }
@@ -84,8 +88,8 @@ class OrderCrudController extends AbstractCrudController
                     ->linkToCrudAction('markAsDeleted')
                     ->addCssClass('btn-danger')
             )
-            ->add(Crud::PAGE_INDEX, Action::DETAIL) // on ajoute l'action détail
-            ->remove(Crud::PAGE_INDEX, Action::EDIT) // on supprime le bouton modifier
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->remove(Crud::PAGE_INDEX, Action::EDIT)
             ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
         return $action->setLabel('Détails')->setIcon('fa fa-eye');
     });
@@ -108,11 +112,18 @@ class OrderCrudController extends AbstractCrudController
             );
     }
 
+    private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
+    {
+        return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
+            ->setController(self::class)
+            ->setAction('index')
+            ->generateUrl());
+    }
+
     public function markAsDeleted(
         Request $request,
         AdminContext $context,
-        AdminUrlGenerator $adminUrlGenerator,
-        EntityManagerInterface $entityManager // on l'injecte ici
+        AdminUrlGenerator $adminUrlGenerator
     ): RedirectResponse {
         $entityIds = $request->request->all('batchActionEntityIds', []);
 
@@ -121,20 +132,7 @@ class OrderCrudController extends AbstractCrudController
             return $this->redirectBackToIndex($context, $adminUrlGenerator);
         }
 
-        $orders = $this->orderRepository->findBy(['id' => $entityIds]);
-
-        $nonDeletable = [];
-
-        foreach ($orders as $order) {
-            if (!$order->isDone()) {
-                $nonDeletable[] = $order->getId();
-                continue;
-            }
-
-            $order->setIsDeleted(true);
-        }
-
-        $entityManager->flush(); // méthode Doctrine officielle & propre
+        $nonDeletable = $this->orderService->markOrdersAsDeletedByIds($entityIds);
 
         if (!empty($nonDeletable)) {
             $this->addFlash('warning', sprintf(
@@ -146,15 +144,6 @@ class OrderCrudController extends AbstractCrudController
         }
 
         return $this->redirectBackToIndex($context, $adminUrlGenerator);
-    }
-
-
-    private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
-    {
-        return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
-            ->setController(self::class)
-            ->setAction('index')
-            ->generateUrl());
     }
 
 

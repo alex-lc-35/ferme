@@ -33,4 +33,53 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return int[] IDs des produits qui n'ont pas de commandes non supprimées
+     */
+    public function findDeletableProductIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p.id')
+            ->leftJoin('p.productOrders', 'po')
+            ->leftJoin('po.orderId', 'o')
+            ->where('p.id IN (:ids)')
+            ->andWhere('o.isDeleted = true OR o.id IS NULL')
+            ->setParameter('ids', $ids)
+            ->groupBy('p.id');
+
+        return array_column($qb->getQuery()->getScalarResult(), 'id');
+    }
+
+    /**
+     * @return string[] Noms des produits liés à des commandes actives (non supprimées)
+     */
+    public function findNonDeletableProductNames(array $ids): array
+    {
+        return array_column(
+            $this->createQueryBuilder('p')
+                ->select('DISTINCT p.name')
+                ->join('p.productOrders', 'po')
+                ->join('po.orderId', 'o')
+                ->where('p.id IN (:ids)')
+                ->andWhere('o.isDeleted = false')
+                ->setParameter('ids', $ids)
+                ->getQuery()
+                ->getScalarResult(),
+            'name'
+        );
+    }
+
+
+    public function softDeleteProductsByIds(array $ids): int
+    {
+        return $this->createQueryBuilder('p')
+            ->update()
+            ->set('p.isDeleted', ':true')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->setParameter('true', true)
+            ->getQuery()
+            ->execute();
+    }
+
 }

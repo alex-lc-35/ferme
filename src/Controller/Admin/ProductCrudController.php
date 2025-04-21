@@ -214,19 +214,18 @@ class ProductCrudController extends AbstractCrudController
             return $this->redirectBackToIndex($context, $adminUrlGenerator);
         }
 
-        $nonDeletable = $this->productService->markProductsAsDeletedByIds($entityIds);
+        $nonDeletableNames = $this->productService->markProductsAsDeletedByIds($entityIds);
 
-        if (!empty($nonDeletable)) {
+        if (!empty($nonDeletableNames)) {
             $this->addFlash('warning', sprintf(
                 'Les produits suivants n\'ont pas été supprimés car ils sont liés à des commandes : %s',
-                implode(', ', $nonDeletable)
+                implode(', ', $nonDeletableNames)
             ));
         } else {
             $this->addFlash('success', 'Produit(s) supprimé(s) !');
         }
 
+
         return $this->redirectBackToIndex($context, $adminUrlGenerator);
     }
-
-
 }
