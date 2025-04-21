@@ -3,14 +3,16 @@
 namespace App\Service\Store;
 
 use App\Dto\ProductDto;
+use App\Entity\Product;
 use App\Repository\Store\ProductStoreRepository;
+use App\Mapper\ProductMapper;
 
 class ProductStoreService
 {
     public function __construct(
         private ProductStoreRepository $productRepository
-    ) {}
-
+    )
+    {}
     /**
      * Get displayed products.
      *
@@ -20,16 +22,10 @@ class ProductStoreService
     {
         $products = $this->productRepository->findDisplayedAvailableProducts();
 
-        return array_map(fn($product) => new ProductDto(
-            id: $product->getId(),
-            name: $product->getName(),
-            price: $product->getPriceInEuros(),
-            unit: $product->getUnit()?->value ?? 'unknown',
-            image: '/uploads/images/' . $product->getImage(),
-            stock: $product->hasStock() ? $product->getStock() : null,
-            limited: $product->isLimited(),
-            discount: $product->isDiscount(),
-            discountText: $product->getDiscountText(),
-        ), $products);
+        return array_map(
+            fn(Product $product) => ProductMapper::toDto($product),
+            $products
+        );
+
     }
 }
