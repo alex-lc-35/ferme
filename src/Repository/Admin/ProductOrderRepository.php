@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Admin;
 
 use App\Entity\ProductOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

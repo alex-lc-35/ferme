@@ -2,9 +2,8 @@
 
 namespace App\Entity;
 
-use App\Enum\OrderStatus;
 use App\Enum\PickupDay;
-use App\Repository\OrderRepository;
+use App\Repository\Admin\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

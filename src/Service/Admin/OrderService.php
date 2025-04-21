@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Admin;
 
-use App\Repository\OrderRepository;
+use App\Repository\Admin\OrderRepository;
 
 class OrderService
 {

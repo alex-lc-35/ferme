@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Admin;
 
 use App\Entity\Message;
-use App\Repository\MessageRepository;
+use App\Repository\Admin\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class MessageService
