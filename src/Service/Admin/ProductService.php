@@ -9,6 +9,12 @@ class ProductService
     public function __construct(
         private ProductRepository $productRepository,
     ) {}
+
+    public function getAllProducts(): array
+    {
+        return $this->productRepository->findAllProducts();
+    }
+
     public function markProductsAsDeletedByIds(array $ids): array
     {
         $nonDeletableNames = $this->productRepository->findNonDeletableProductNames($ids);
