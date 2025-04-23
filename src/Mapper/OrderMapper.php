@@ -2,11 +2,18 @@
 
 namespace App\Mapper;
 
+use App\Dto\OrderCreateDto;
 use App\Dto\OrderWithItemsDto;
 use App\Entity\Order;
+use App\Dto\ProductOrderDto;
+use App\Entity\ProductOrder;
+use App\Entity\User;
+use App\Enum\PickupDay;
+use App\Service\Store\StockStoreService;
 
 class OrderMapper
 {
+
     public static function toDto(Order $order): OrderWithItemsDto
     {
         $items = [];
@@ -14,12 +21,11 @@ class OrderMapper
         foreach ($order->getProductOrders() as $po) {
             $product = $po->getProduct();
 
-            $items[] = [
-                'productId' => $product->getId(),
-                'productName' => $product->getName(),
-                'unitPrice' => $po->getUnitPrice() / 100,
-                'quantity' => $po->getQuantity(),
-            ];
+            $items[] = new ProductOrderDto(
+                productName: $product->getName(),
+                quantity: $po->getQuantity(),
+                unitPrice: (int) ($po->getUnitPrice() / 100),
+            );
         }
 
         return new OrderWithItemsDto(
@@ -31,4 +37,39 @@ class OrderMapper
             items: $items
         );
     }
+
+    public static function fromDto(
+        OrderCreateDto $orderCreateDto,
+        User $user,
+        array $productData
+    ): Order {
+        $order = new Order();
+        $order->setUser($user)
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setPickup(PickupDay::from($orderCreateDto->pickup))
+            ->setDone(false);
+
+        $total = 0;
+
+        foreach ($productData as $entry) {
+            $product = $entry['product'];
+            $quantity = $entry['quantity'];
+
+            $productOrder = new ProductOrder();
+            $productOrder
+                ->setProduct($product)
+                ->setQuantity($quantity)
+                ->setUnitPrice($product->getPrice())
+                ->setOrder($order);
+
+            $order->addProductOrder($productOrder);
+            $total += $quantity * $product->getPrice();
+        }
+
+        $order->setTotal($total);
+
+        return $order;
+    }
+
+
 }
