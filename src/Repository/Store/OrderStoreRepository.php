@@ -6,15 +6,21 @@ use App\Entity\Order;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @extends ServiceEntityRepository<Order>
  */
 class OrderStoreRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    private EntityManagerInterface $em;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        EntityManagerInterface $em
+    ) {
         parent::__construct($registry, Order::class);
+        $this->em = $em;
     }
 
     /**
@@ -23,11 +29,28 @@ class OrderStoreRepository extends ServiceEntityRepository
     public function findOrdersByUser(User $user): array
     {
         return $this->createQueryBuilder('o')
-            ->where('o.user = :user')
-            ->andWhere('o.isDeleted = false')
+            ->andWhere('o.user = :user')
             ->setParameter('user', $user)
             ->orderBy('o.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+
+    public function save(Order $order, bool $flush = true): void
+    {
+        $this->em->persist($order);
+        if ($flush) {
+            $this->em->flush();
+        }
+    }
+
+
+    public function remove(Order $order, bool $flush = true): void
+    {
+        $this->em->remove($order);
+        if ($flush) {
+            $this->em->flush();
+        }
     }
 }
