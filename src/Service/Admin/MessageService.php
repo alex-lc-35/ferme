@@ -14,10 +14,10 @@ class MessageService
     ) {}
 
     /**
-     * Désactive les autres messages du même type,
-     * excepté celui qu’on vient de créer ou de mettre à jour.
+     * Disable other messages of the same type when a new message is created or updated.
+     *
+     * @param Message $current The current message.
      */
-
     public function disableOtherMessages(Message $current): void
     {
         $id = $current->getId() ?? 0;

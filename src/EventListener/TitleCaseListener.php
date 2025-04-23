@@ -7,6 +7,10 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 use ReflectionClass;
 use ReflectionProperty;
 
+/**
+ * Listener to  convert string properties to title case
+ * before persisting or updating the entity.
+ */
 
 class TitleCaseListener
 {

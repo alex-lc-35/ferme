@@ -37,7 +37,12 @@ class Order
     /**
      * @var Collection<int, ProductOrder>
      */
-    #[ORM\OneToMany(targetEntity: ProductOrder::class, mappedBy: 'orderId')]
+    #[ORM\OneToMany(
+        targetEntity: ProductOrder::class,
+        mappedBy: 'order',
+        cascade: ['persist'],
+        orphanRemoval: false
+    )]
     private Collection $productOrders;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
@@ -128,7 +133,7 @@ class Order
     {
         if (!$this->productOrders->contains($productOrder)) {
             $this->productOrders->add($productOrder);
-            $productOrder->setOrderId($this);
+            $productOrder->setOrder($this);
         }
 
         return $this;
@@ -138,8 +143,8 @@ class Order
     {
         if ($this->productOrders->removeElement($productOrder)) {
             // set the owning side to null (unless already changed)
-            if ($productOrder->getOrderId() === $this) {
-                $productOrder->setOrderId(null);
+            if ($productOrder->getOrder() === $this) {
+                $productOrder->setOrder(null);
             }
         }
 

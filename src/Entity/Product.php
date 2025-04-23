@@ -304,7 +304,6 @@ class Product
     public function removeProductOrder(ProductOrder $productOrder): static
     {
         if ($this->productOrders->removeElement($productOrder)) {
-            // set the owning side to null (unless already changed)
             if ($productOrder->getProduct() === $this) {
                 $productOrder->setProduct(null);
             }
@@ -312,6 +311,26 @@ class Product
 
         return $this;
     }
+
+
+    public function canDecrementStock(int $quantity): bool
+    {
+        return !$this->hasStock() || ($this->stock !== null && $this->stock >= $quantity);
+    }
+
+    public function decrementStock(int $quantity): void
+    {
+        if (!$this->hasStock()) {
+            return;
+        }
+
+        $this->stock -= $quantity;
+
+        if ($this->stock <= 0) {
+            $this->isDisplayed = false;
+        }
+    }
+
 
     #[Assert\Callback]
     public function validateStockRequirement(ExecutionContextInterface $context): void

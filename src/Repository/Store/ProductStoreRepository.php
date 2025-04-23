@@ -22,8 +22,11 @@ class ProductStoreRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
             ->where('p.isDisplayed = true')
+            ->andWhere('p.isDeleted = false')
             ->orderBy('p.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
+
+
 }

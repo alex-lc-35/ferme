@@ -45,6 +45,7 @@ class ProductCrudController extends AbstractCrudController
         return Product::class;
     }
 
+
     public function configureAssets(Assets $assets): Assets
     {
         return $assets
@@ -158,14 +159,6 @@ class ProductCrudController extends AbstractCrudController
         ];
     }
 
-    public function createEntity(string $entityFqcn)
-    {
-        /** @var Product $product */
-        $product = new Product();
-        $product->setUser($this->security->getUser());
-
-        return $product;
-    }
 
 
     public function configureActions(Actions $actions): Actions
@@ -200,6 +193,13 @@ class ProductCrudController extends AbstractCrudController
             );
     }
 
+    public function createEntity(string $entityFqcn): Product
+    {
+        $product = new Product();
+        $product->setUser($this->security->getUser());
+
+        return $product;
+    }
     private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
     {
         return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
@@ -245,5 +245,4 @@ class ProductCrudController extends AbstractCrudController
 
         return $qb->andWhere('entity.isDeleted = false');
     }
-
 }

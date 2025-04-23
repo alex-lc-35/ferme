@@ -10,10 +10,12 @@ class ProductService
         private ProductRepository $productRepository,
     ) {}
 
-    public function getAllProducts(): array
-    {
-        return $this->productRepository->findAllProducts();
-    }
+    /**
+     * Mark products as deleted by their IDs.
+     *
+     * @param int[] $ids
+     * @return string[] Names of products that cannot be deleted
+     */
 
     public function markProductsAsDeletedByIds(array $ids): array
     {
