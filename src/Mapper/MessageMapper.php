@@ -2,7 +2,7 @@
 
 namespace App\Mapper;
 
-use App\Dto\MessageDto;
+use App\Dto\Message\MessageDto;
 use App\Entity\Message;
 
 class MessageMapper

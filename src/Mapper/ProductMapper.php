@@ -2,7 +2,7 @@
 
 namespace App\Mapper;
 
-use App\Dto\ProductDto;
+use App\Dto\Product\ProductDto;
 use App\Entity\Product;
 
 class ProductMapper

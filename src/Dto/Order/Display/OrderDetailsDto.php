@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Dto;
+namespace App\Dto\Order\Display;
 
-readonly class OrderWithItemsDto
+readonly class OrderDetailsDto
 {
     /**
-     * @param ProductOrderDto[] $items
+     * detailed order information for display to the client
+     *
+     * @param OrderItemDto[] $items
      */
     public function __construct(
         public int $id,

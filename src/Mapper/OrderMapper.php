@@ -2,33 +2,32 @@
 
 namespace App\Mapper;
 
-use App\Dto\OrderCreateDto;
-use App\Dto\OrderWithItemsDto;
+use App\Dto\Order\Create\OrderCreateDto;
+use App\Dto\Order\Display\OrderDetailsDto;
+use App\Dto\Order\Display\OrderItemDto;
 use App\Entity\Order;
-use App\Dto\ProductOrderDto;
 use App\Entity\ProductOrder;
 use App\Entity\User;
 use App\Enum\PickupDay;
-use App\Service\Store\StockStoreService;
 
 class OrderMapper
 {
 
-    public static function toDto(Order $order): OrderWithItemsDto
+    public static function toDto(Order $order): OrderDetailsDto
     {
         $items = [];
 
         foreach ($order->getProductOrders() as $po) {
             $product = $po->getProduct();
 
-            $items[] = new ProductOrderDto(
+            $items[] = new OrderItemDto(
                 productName: $product->getName(),
                 quantity: $po->getQuantity(),
                 unitPrice: (int) ($po->getUnitPrice() / 100),
             );
         }
 
-        return new OrderWithItemsDto(
+        return new OrderDetailsDto(
             id: $order->getId(),
             total: $order->getTotal(),
             pickup: $order->getPickup()?->value,
@@ -70,6 +69,5 @@ class OrderMapper
 
         return $order;
     }
-
 
 }

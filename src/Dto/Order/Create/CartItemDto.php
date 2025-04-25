@@ -1,6 +1,9 @@
 <?php
-namespace App\Dto;
+namespace App\Dto\Order\Create;
 
+/**
+ * single item in the shopping cart for order creation.
+ */
 readonly class CartItemDto
 {
 public function __construct(
