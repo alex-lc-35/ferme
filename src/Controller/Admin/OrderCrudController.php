@@ -76,7 +76,7 @@ class OrderCrudController extends AbstractCrudController
                 CollectionField::new('productOrders',)
                     ->onlyOnDetail()
                     ->setLabel(false)
-                    ->setTemplatePath('admin/order_product_orders.html.twig'),
+                    ->setTemplatePath('admin/user_order.html.twig'),
             ];}
 
 
@@ -95,6 +95,7 @@ class OrderCrudController extends AbstractCrudController
             )
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->remove(Crud::PAGE_INDEX, Action::EDIT)
+            ->remove(Crud::PAGE_DETAIL, Action::EDIT)
             ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
         return $action->setLabel('Détails')->setIcon('fa fa-eye');
     });
@@ -125,6 +126,7 @@ class OrderCrudController extends AbstractCrudController
             ->generateUrl());
     }
 
+
     public function markAsDeleted(
         Request $request,
         AdminContext $context,
@@ -150,6 +152,7 @@ class OrderCrudController extends AbstractCrudController
 
         return $this->redirectBackToIndex($context, $adminUrlGenerator);
     }
+
 
     public function createIndexQueryBuilder(
         SearchDto $searchDto,

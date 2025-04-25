@@ -1,19 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM entièrement chargé pour Tomselected');
 
-    // --- Gestion du champ "inter" ---
-    // Sélectionne le widget Tomselected, le select caché et le conteneur du champ "inter".
+
     const tsControl = document.querySelector('.ts-control');
     const interWrapper = document.querySelector('.inter-wrapper');
     const selectElement = document.querySelector('select[name$="[unit]"]');
 
 
-    // Fonction pour afficher/masquer le conteneur "inter"
+
     function toggleInterField() {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const optionText = selectedOption ? selectedOption.text : '';
         console.log("Option sélectionnée :", optionText);
-        // Affiche le conteneur uniquement si l'option sélectionnée est "Kilo"
         interWrapper.style.display = (optionText === 'Kilo') ? 'block' : 'none';
     }
 
@@ -23,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleInterField();
     }
 
-    // --- Gestion du champ "stock" ---
+    // Hide the "hasStock" field if the "stock" field is not checked
     const hasStockWrapper = document.querySelector('.has-stock-wrapper');
     const hasStockCheckbox = document.querySelector('input[name$="[hasStock]"]');
     const stockWrapper = document.querySelector('.stock-wrapper');
@@ -32,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const stockWidget = stockWrapper.querySelector('.form-widget');
         const stockLabel = stockWrapper.querySelector('label');
 
-        // Crée un wrapper pour tout déplacer ensemble dans le champ du switch
         const inlineGroup = document.createElement('div');
         inlineGroup.classList.add('stock-inline-group');
         inlineGroup.style.display = 'flex';
@@ -62,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- Gestion du champ "Texte Promo" ---
+    // Hide the "discount text" field if the "discount" field is not checked
+
     const discountCheckbox = document.querySelector('input[name$="[discount]"]');
     const discountTextWrapper = document.querySelector('.discountText-wrapper');
 

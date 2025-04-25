@@ -18,8 +18,12 @@ class ProductOrderRepository extends ServiceEntityRepository
     public function getUserProductQuantities(): array
     {
         return $this->createQueryBuilder('po')
-            ->select('IDENTITY(o.user) AS userId', 'IDENTITY(po.product) AS productId', 'SUM(po.quantity) AS totalQuantity')
-            ->join('po.orderId', 'o')
+            ->select(
+                'IDENTITY(o.user)    AS userId',
+                'IDENTITY(po.product) AS productId',
+                'SUM(po.quantity)     AS totalQuantity'
+            )
+            ->join('po.order', 'o')
             ->where('o.isDeleted = false')
             ->groupBy('userId', 'productId')
             ->getQuery()

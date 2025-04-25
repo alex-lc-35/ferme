@@ -1,5 +1,5 @@
 {% set productOrders = field.value %}
-{% set order = productOrders|first ? productOrders|first.orderId : null %}
+{% set order = productOrders|first ? productOrders|first.order : null %}
 
 {% if order %}
     <div class="mb-4 p-3 border rounded bg-light">

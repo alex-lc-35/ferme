@@ -30,7 +30,9 @@ class StockStoreService
             );
         }
 
-        $product->decrementStock($quantity);
+        if ($product->hasStock()) {
+            $product->decrementStock($quantity);
+        }
 
         return $product;
     }

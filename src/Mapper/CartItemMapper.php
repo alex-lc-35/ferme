@@ -2,7 +2,7 @@
 
 namespace App\Mapper;
 
-use App\Dto\CartItemDto;
+use App\Dto\Order\Create\CartItemDto;
 
 class CartItemMapper
 {

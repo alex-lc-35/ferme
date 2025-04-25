@@ -2,9 +2,8 @@
 
 namespace App\Controller\Store;
 
-use App\Dto\CartItemDto;
-use App\Dto\OrderCreateDto;
-use App\Enum\PickupDay;
+use App\Dto\Order\Create\CartItemDto;
+use App\Dto\Order\Create\OrderCreateDto;
 use App\Service\Store\OrderStoreService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +38,6 @@ class OrderStoreController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        // Validation manuelle simple
         if (empty($data['items']) || empty($data['pickup'])) {
             return $this->json(['error' => 'Champs manquants.'], 400);
         }

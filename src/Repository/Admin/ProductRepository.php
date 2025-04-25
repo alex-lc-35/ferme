@@ -17,28 +17,17 @@ class ProductRepository extends ServiceEntityRepository
     }
 
 
-    /**
-     * @return Product[] returns an array of Product
-     */
-    public function findAllProducts(): array
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.isDeleted = false')
-            ->orderBy('p.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
 
     /**
-     * Récupère les produits ayant une quantité totale commandée supérieure à 0.
+     * Get product with orders > 0.
      *
-     * @return Product[] Renvoie un tableau d'entités Product
+     * @return Product[]
      */
     public function findProductsWithOrderedQuantities(): array
     {
         return $this->createQueryBuilder('p')
             ->join('p.productOrders', 'po')
-            ->join('po.orderId', 'o')
+            ->join('po.order', 'o')
             ->andWhere('o.isDeleted = false')
             ->groupBy('p.id')
             ->having('SUM(po.quantity) > 0')
@@ -47,14 +36,14 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return int[] IDs des produits qui n'ont pas de commandes non supprimées
+     * @return int[] Get product IDs that can be deleted (not linked to orders).
      */
     public function findDeletableProductIds(array $ids): array
     {
         $qb = $this->createQueryBuilder('p')
             ->select('p.id')
             ->leftJoin('p.productOrders', 'po')
-            ->leftJoin('po.orderId', 'o')
+            ->leftJoin('po.order', 'o')
             ->where('p.id IN (:ids)')
             ->andWhere('o.isDeleted = true OR o.id IS NULL')
             ->setParameter('ids', $ids)
@@ -64,7 +53,7 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return string[] Noms des produits liés à des commandes actives (non supprimées)
+     * @return string[] Get product names that can not be deleted ( linked to orders)
      */
     public function findNonDeletableProductNames(array $ids): array
     {
@@ -72,7 +61,7 @@ class ProductRepository extends ServiceEntityRepository
             $this->createQueryBuilder('p')
                 ->select('DISTINCT p.name')
                 ->join('p.productOrders', 'po')
-                ->join('po.orderId', 'o')
+                ->join('po.order', 'o')
                 ->where('p.id IN (:ids)')
                 ->andWhere('o.isDeleted = false')
                 ->setParameter('ids', $ids)
@@ -82,6 +71,13 @@ class ProductRepository extends ServiceEntityRepository
         );
     }
 
+
+    /**
+     * Soft delete products by IDs.
+     *
+     * @param int[] $ids
+     * @return int Number of affected rows
+     */
 
     public function softDeleteProductsByIds(array $ids): int
     {
