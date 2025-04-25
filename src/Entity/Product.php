@@ -315,17 +315,15 @@ class Product
 
     public function canDecrementStock(int $quantity): bool
     {
-        return !$this->hasStock() || ($this->stock !== null && $this->stock >= $quantity);
+        return $this->hasStock()
+            && $this->stock !== null
+            && $this->stock >= $quantity;
     }
 
     public function decrementStock(int $quantity): void
     {
-        if (!$this->hasStock()) {
-            return;
-        }
 
         $this->stock -= $quantity;
-
         if ($this->stock <= 0) {
             $this->isDisplayed = false;
         }
