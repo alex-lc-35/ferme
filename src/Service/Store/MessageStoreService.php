@@ -2,7 +2,7 @@
 
 namespace App\Service\Store;
 
-use App\Dto\MessageDto;
+use App\Dto\Message\MessageDto;
 use App\Mapper\MessageMapper;
 use App\Repository\Store\MessageStoreRepository;
 

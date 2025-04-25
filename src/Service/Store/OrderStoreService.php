@@ -1,8 +1,8 @@
 <?php
 namespace App\Service\Store;
 
-use App\Dto\OrderCreateDto;
-use App\Dto\OrderWithItemsDto;
+use App\Dto\Order\Create\OrderCreateDto;
+use App\Dto\Order\Display\OrderDetailsDto;
 use App\Entity\Order;
 use App\Entity\User;
 use App\Mapper\OrderMapper;
@@ -19,30 +19,32 @@ class OrderStoreService
 
     /**
      * @param User $user
-     * @return OrderWithItemsDto[]
+     * @return OrderDetailsDto[]
      */
     public function getOrdersForUser(User $user): array
     {
         $orders = $this->orderStoreRepository->findOrdersByUser($user);
-
-        return array_map([OrderMapper::class, 'toDto'], $orders);
+        $dtos = [];
+        foreach ($orders as $order) {
+            $dtos[] = OrderMapper::toDto($order);
+        }
+        return $dtos;
     }
 
-    public function createOrderFromCart(OrderCreateDto $dto, User $user): Order
+    public function createOrderFromCart(OrderCreateDto $orderCreateDto, User $user): Order
     {
         $productData = [];
 
-        foreach ($dto->items as $item) {
+        foreach ($orderCreateDto->items as $item) {
             $product = $this->stockService->checkAndDecreaseStock($item->productId, $item->quantity);
             $productData[] = [
                 'product' => $product,
                 'quantity' => $item->quantity,
             ];
         }
-        $order = OrderMapper::fromDto($dto, $user, $productData);
+        $order = OrderMapper::fromDto($orderCreateDto, $user, $productData);
 
         $this->orderStoreRepository->save($order);
         return $order;
     }
-
 }

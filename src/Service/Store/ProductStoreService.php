@@ -2,10 +2,10 @@
 
 namespace App\Service\Store;
 
-use App\Dto\ProductDto;
+use App\Dto\Product\ProductDto;
 use App\Entity\Product;
-use App\Repository\Store\ProductStoreRepository;
 use App\Mapper\ProductMapper;
+use App\Repository\Store\ProductStoreRepository;
 
 class ProductStoreService
 {
