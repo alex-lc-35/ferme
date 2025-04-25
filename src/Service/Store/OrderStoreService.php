@@ -24,11 +24,11 @@ class OrderStoreService
     public function getOrdersForUser(User $user): array
     {
         $orders = $this->orderStoreRepository->findOrdersByUser($user);
-        $dtos = [];
+        $orderDtos = [];
         foreach ($orders as $order) {
-            $dtos[] = OrderMapper::toDto($order);
+            $orderDtos[] = OrderMapper::toDto($order);
         }
-        return $dtos;
+        return $orderDtos;
     }
 
     public function createOrderFromCart(OrderCreateDto $orderCreateDto, User $user): Order
