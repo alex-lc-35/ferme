@@ -95,6 +95,7 @@ class OrderCrudController extends AbstractCrudController
             )
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->remove(Crud::PAGE_INDEX, Action::EDIT)
+            ->remove(Crud::PAGE_DETAIL, Action::EDIT)
             ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
         return $action->setLabel('Détails')->setIcon('fa fa-eye');
     });
