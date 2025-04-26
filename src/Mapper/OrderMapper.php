@@ -23,13 +23,13 @@ class OrderMapper
             $items[] = new OrderItemDto(
                 productName: $product->getName(),
                 quantity: $po->getQuantity(),
-                unitPrice: (int) ($po->getUnitPrice() / 100),
+                unitPrice: round($po->getUnitPrice() !== null ? $po->getUnitPrice() / 100 : 0.0, 2),
             );
         }
 
         return new OrderDetailsDto(
             id: $order->getId(),
-            total: $order->getTotal(),
+            total: round($order->getTotal() !== null ? $order->getTotal() / 100 : 0.0, 2),
             pickup: $order->getPickup()?->value,
             createdAt: $order->getCreatedAt(),
             done: $order->isDone(),

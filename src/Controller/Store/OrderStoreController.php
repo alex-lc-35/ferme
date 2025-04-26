@@ -24,7 +24,13 @@ class OrderStoreController extends AbstractController
 
         $orderDtos = $orderStoreService->getOrdersForUser($user);
 
-        return $this->json($orderDtos);
+        $response = new JsonResponse();
+        $response->setEncodingOptions(
+            $response->getEncodingOptions() | JSON_PRESERVE_ZERO_FRACTION
+        );
+        $response->setData($orderDtos);
+
+        return $response;
     }
 
     #[Route('/create', name: 'create', methods: ['POST'])]
