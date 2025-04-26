@@ -11,7 +11,7 @@ readonly class OrderDetailsDto
      */
     public function __construct(
         public int $id,
-        public int $total,
+        public float  $total,
         public string $pickup,
         public \DateTimeImmutable $createdAt,
         public bool $done,

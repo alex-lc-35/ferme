@@ -10,6 +10,6 @@ readonly class OrderItemDto
     public function __construct(
         public string $productName,
         public int $quantity,
-        public int $unitPrice
+        public float  $unitPrice
     ) {}
 }
