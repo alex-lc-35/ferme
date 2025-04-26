@@ -34,28 +34,23 @@
 
     <script>
         function copyEmails(btn) {
-            // Sauvegarde le texte d'origine du bouton
             const original = btn.innerHTML;
 
-            // Récupère et copie les emails
             const emails = Array.from(document.querySelectorAll('.user-email'))
                 .map(el => el.textContent.trim())
                 .join(', ');
 
             navigator.clipboard.writeText(emails)
                 .then(() => {
-                    // Change le texte du bouton
                     btn.textContent = 'Emails copiés !';
                     btn.disabled = true;
-                    // Après 3 secondes, on remet le texte et on réactive
                     setTimeout(() => {
                         btn.innerHTML = original;
                         btn.disabled = false;
-                    }, 3000);
+                    }, 2500);
                 })
                 .catch(err => {
                     console.error('Erreur lors de la copie :', err);
-                    // Tu peux gérer une alerte d'erreur ici si nécessaire
                 });
         }
     </script>
