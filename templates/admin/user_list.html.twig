@@ -4,7 +4,8 @@
     <div class="pt-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h1 class="title fw-bold fs-3">📱 Utilisateurs</h1>
-            <button class="btn btn-primary" onclick="copyEmails()">📋 Copier tous les emails</button>
+            {# on passe la référence du bouton à la fonction #}
+            <button class="btn btn-primary" onclick="copyEmails(this)">📋 Copier tous les emails</button>
         </div>
 
         <div class="table-responsive">
@@ -31,19 +32,26 @@
         </div>
     </div>
 
-
     <script>
-        function copyEmails() {
+        function copyEmails(btn) {
+            const original = btn.innerHTML;
+
             const emails = Array.from(document.querySelectorAll('.user-email'))
                 .map(el => el.textContent.trim())
                 .join(', ');
 
-            navigator.clipboard.writeText(emails).then(() => {
-                alert('Emails copiés dans le presse-papiers 📋');
-            }).catch(err => {
-                alert('Erreur lors de la copie');
-                console.error(err);
-            });
+            navigator.clipboard.writeText(emails)
+                .then(() => {
+                    btn.textContent = 'Emails copiés !';
+                    btn.disabled = true;
+                    setTimeout(() => {
+                        btn.innerHTML = original;
+                        btn.disabled = false;
+                    }, 2500);
+                })
+                .catch(err => {
+                    console.error('Erreur lors de la copie :', err);
+                });
         }
     </script>
 {% endblock %}
