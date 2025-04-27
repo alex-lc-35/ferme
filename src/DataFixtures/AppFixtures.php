@@ -8,7 +8,6 @@ use App\Entity\Product;
 use App\Entity\ProductOrder;
 use App\Entity\User;
 use App\Enum\MessageType;
-use App\Enum\OrderStatus;
 use App\Enum\PickupDay;
 use App\Enum\ProductUnit;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -59,30 +58,37 @@ class AppFixtures extends Fixture
             $product = new Product();
             $product->setName($faker->word());
             $product->setPrice($faker->numberBetween(10, 500));
-            $product->setUnit($faker->randomElement([
+
+            $unit = $faker->randomElement([
                 ProductUnit::PIECE,
                 ProductUnit::BUNDLE,
                 ProductUnit::BUNCH,
                 ProductUnit::LITER,
                 ProductUnit::KG
-            ]));
-            $product->setInter($faker->randomFloat(2, 1, 100));
+            ]);
+            $product->setUnit($unit);
+
+            if ($unit === ProductUnit::KG) {
+                $product->setInter($faker->randomFloat(2, 0.1, 0.9)); // uniquement entre 0.1 et 0.9
+            }
+
             $product->setIsDisplayed($faker->boolean());
             $product->setHasStock($faker->boolean());
             $product->setStock($faker->numberBetween(0, 100));
             $product->setLimited($faker->boolean());
             $product->setDiscount($faker->boolean());
             $product->setDiscountText($faker->boolean() ? $faker->sentence() : null);
-            $product->setImage($faker->imageUrl(640, 480, 'food'));
-            $product->setUser($admin); // Seul l'admin peut créer des produits
+            $product->setImage('tomates.jpg');
+            $product->setUser($admin);
 
             $manager->persist($product);
             $products[] = $product;
         }
 
+
         // Création de commandes pour les utilisateurs standards
         foreach ($users as $user) {
-            for ($j = 0; $j < rand(1, 3); $j++) { // Chaque utilisateur passe 1 à 3 commandes
+            for ($j = 0; $j < rand(1, 2); $j++) { // Chaque utilisateur passe 1 à 3 commandes
                 $order = new Order();
                 $order->setUser($user);
                 $order->setTotal(0); // Le total sera calculé plus tard
@@ -113,19 +119,30 @@ class AppFixtures extends Fixture
             }
         }
 
-        for ($m = 0; $m < rand(1, 5); $m++) { // L'admin publie entre 1 et 5 messages visibles par tous
-            $message = new Message();
-            $message->setUser($admin);
-            $message->setType($faker->randomElement([
-                MessageType::MARQUEE,
-                MessageType::CLOSEDSHOP,
-            ]));
-            $message->setContent($faker->sentence());
-            $message->setIsActive($faker->boolean());
+        $messageTypes = [
+            MessageType::MARQUEE,
+            MessageType::CLOSEDSHOP,
+        ];
 
-            $manager->persist($message);
+        foreach ($messageTypes as $type) {
+            // 1 message actif
+            $activeMessage = new Message();
+            $activeMessage->setUser($admin);
+            $activeMessage->setType($type);
+            $activeMessage->setContent($faker->sentence());
+            $activeMessage->setIsActive(true);
+            $manager->persist($activeMessage);
+
+            // 1 message inactif
+            $inactiveMessage = new Message();
+            $inactiveMessage->setUser($admin);
+            $inactiveMessage->setType($type);
+            $inactiveMessage->setContent($faker->sentence());
+            $inactiveMessage->setIsActive(false);
+            $manager->persist($inactiveMessage);
         }
 
         $manager->flush();
+
     }
 }
