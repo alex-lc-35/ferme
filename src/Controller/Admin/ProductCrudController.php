@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Enum\ProductUnit;
 use App\Service\Admin\ProductService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\{Action, Actions, Crud, Filters};
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -35,7 +36,8 @@ class ProductCrudController extends AbstractCrudController
     private Security $security;
     private ProductService $productService;
 
-    public function __construct(Security $security, ProductService $productService)    {
+    public function __construct(Security $security, ProductService $productService)
+    {
         $this->security = $security;
         $this->productService = $productService;
     }
@@ -98,24 +100,24 @@ class ProductCrudController extends AbstractCrudController
                     'Litre' => ProductUnit::LITER,
                     'Kilo' => ProductUnit::KG,
                 ])
+                ->renderAsBadges([
+                    ProductUnit::PIECE->value => 'primary',
+                    ProductUnit::BUNDLE->value => 'success',
+                    ProductUnit::BUNCH->value => 'warning',
+                    ProductUnit::LITER->value => 'info',
+                    ProductUnit::KG->value => 'secondary',
+                ])
+                ->formatValue(function ($value, $entity) {
+                    return match ($value?->value ?? null) {
+                        'PIECE' => 'Pièce',
+                        'BUNDLE' => 'Botte',
+                        'BUNCH' => 'Bouquet',
+                        'LITER' => 'Litre',
+                        'KG' => 'Kilo',
+                        default => $value?->value ?? '',
+                    };
+                }),
 
-            ->renderAsBadges([
-        ProductUnit::PIECE->value => 'primary',
-        ProductUnit::BUNDLE->value => 'success',
-        ProductUnit::BUNCH->value => 'warning',
-        ProductUnit::LITER->value => 'info',
-        ProductUnit::KG->value => 'secondary',
-    ])
-        ->formatValue(function ($value, $entity) {
-            return match ($value?->value ?? null) {
-                'PIECE' => 'Pièce',
-                'BUNDLE' => 'Botte',
-                'BUNCH' => 'Bouquet',
-                'LITER' => 'Litre',
-                'KG' => 'Kilo',
-                default => $value?->value ?? '',
-            };
-        }),
 
             NumberField::new('inter')
                 ->onlyOnForms()
@@ -160,14 +162,13 @@ class ProductCrudController extends AbstractCrudController
     }
 
 
-
     public function configureActions(Actions $actions): Actions
     {
         $returnAction = Action::new('Retour')
             ->linkToUrl('/admin/product');
 
         return $actions
-            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $a) => $a->setLabel('Ajouter un produit'))
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn(Action $a) => $a->setLabel('Ajouter un produit'))
             ->disable(Action::DELETE)
             ->addBatchAction(
                 Action::new('markDeleted', 'Supprimer produit(s)')
@@ -187,8 +188,8 @@ class ProductCrudController extends AbstractCrudController
                 ChoiceFilter::new('isDisplayed')
                     ->setLabel('Affiché')
                     ->setChoices([
-                        'Affiché'      => true,
-                        'Non affiché'  => false,
+                        'Affiché' => true,
+                        'Non affiché' => false,
                     ])
             );
     }
@@ -200,6 +201,7 @@ class ProductCrudController extends AbstractCrudController
 
         return $product;
     }
+
     private function redirectBackToIndex(AdminContext $context, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
     {
         return $this->redirect($context->getReferrer() ?? $adminUrlGenerator
@@ -209,10 +211,11 @@ class ProductCrudController extends AbstractCrudController
     }
 
     public function markAsDeleted(
-        Request $request,
-        AdminContext $context,
+        Request           $request,
+        AdminContext      $context,
         AdminUrlGenerator $adminUrlGenerator
-    ): RedirectResponse {
+    ): RedirectResponse
+    {
         $entityIds = $request->request->all('batchActionEntityIds', []);
 
         if (empty($entityIds)) {
@@ -236,13 +239,45 @@ class ProductCrudController extends AbstractCrudController
     }
 
     public function createIndexQueryBuilder(
-        SearchDto $searchDto,
-        EntityDto $entityDto,
-        FieldCollection $fields,
+        SearchDto        $searchDto,
+        EntityDto        $entityDto,
+        FieldCollection  $fields,
         FilterCollection $filters
-    ): QueryBuilder {
+    ): QueryBuilder
+    {
         $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
 
         return $qb->andWhere('entity.isDeleted = false');
+    }
+
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if (!$entityInstance instanceof Product) {
+            return;
+        }
+
+        $this->handleInterDependingOnUnit($entityInstance);
+
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if (!$entityInstance instanceof Product) {
+            return;
+        }
+
+        $this->handleInterDependingOnUnit($entityInstance);
+
+        parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    private function handleInterDependingOnUnit(Product $product): void
+    {
+        if ($product->getUnit() !== ProductUnit::KG) {
+            $product->setInter(null);
+        }
     }
 }

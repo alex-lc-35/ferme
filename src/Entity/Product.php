@@ -134,8 +134,13 @@ class Product
     {
         $this->unit = $unit;
 
+        if ($unit !== ProductUnit::KG) {
+            $this->inter = null;
+        }
+
         return $this;
     }
+
 
     public function getInter(): ?float
     {
@@ -331,13 +336,22 @@ class Product
 
 
     #[Assert\Callback]
-    public function validateStockRequirement(ExecutionContextInterface $context): void
+    public function validateProductRequirements(ExecutionContextInterface $context): void
     {
         if ($this->hasStock && ($this->stock === null || $this->stock < 0)) {
             $context->buildViolation('Le stock est requis ')
                 ->atPath('stock')
                 ->addViolation();
         }
+
+        if ($this->unit === ProductUnit::KG && ($this->inter === null || $this->inter <= 0)) {
+            $context->buildViolation('L\'intervalle est requis pour un produit vendu au kilo.')
+                ->atPath('inter')
+                ->addViolation();
+        }
+
     }
+
+
 
 }
