@@ -3,6 +3,7 @@
 namespace App\Repository\Admin;
 
 use App\Entity\Product;
+use App\Enum\PickupDay;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
