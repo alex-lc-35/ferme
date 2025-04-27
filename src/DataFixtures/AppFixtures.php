@@ -98,7 +98,7 @@ class AppFixtures extends Fixture
                     $unitPrice = $product->getPrice();
 
                     $productOrder = new ProductOrder();
-                    $productOrder->setOrderId($order);
+                    $productOrder->setOrder($order);
                     $productOrder->setProduct($product);
                     $productOrder->setQuantity($quantity);
                     $productOrder->setUnitPrice($unitPrice);
