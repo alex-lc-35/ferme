@@ -8,6 +8,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
+/**
+ * Displays the product-client quantities table for a specific pickup day (Tuesday or Thursday).
+ *
+ * @Route("/admin/product-client-tab", name="admin_product_client_tab")
+ *
+ * @param Request $request
+ *     The current HTTP request, containing query parameters.
+ * @param ProductClientTabService $service
+ *     The service fetching products, users, and quantities.
+ *
+ * @return Response
+ *     The rendered HTML page with the product-client quantities table.
+ */
+
 class ProductClientTabController extends AbstractController
 {
     #[Route('/admin/product-client-tab', name: 'admin_product_client_tab')]
@@ -16,7 +31,6 @@ class ProductClientTabController extends AbstractController
         $pickupValue = $request->query->get('pickup', PickupDay::TUESDAY->value);
         $pickupDay   = PickupDay::from($pickupValue);
 
-        // plus de null-check : on appelle directement
         [$products, $users, $quantitiesTab] = $service
             ->getProductClientQuantities($pickupDay);
 
@@ -27,5 +41,4 @@ class ProductClientTabController extends AbstractController
             'selectedPickupDay' => $pickupDay,
         ]);
     }
-
 }

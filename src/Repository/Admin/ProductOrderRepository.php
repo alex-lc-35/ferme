@@ -1,5 +1,4 @@
 <?php
-// src/Repository/Admin/ProductOrderRepository.php
 
 namespace App\Repository\Admin;
 
@@ -16,8 +15,8 @@ class ProductOrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Renvoie la liste distincte des productId pour les commandes
-     * non-deleted et au pickup donné.
+     * Returns a distinct list of product IDs for orders
+     *  that are not deleted and match the given pickup day.
      *
      * @return int[]
      */
@@ -36,9 +35,8 @@ class ProductOrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * Votre méthode existante pour les quantités brutes.
-     *
-     * @return array{userId:int,productId:int,totalQuantity:string}[]
+     * Returns the calculated product quantities ordered by each user
+     * for a specific pickup day  for non-deleted orders.
      */
     public function getUserProductQuantitiesByPickupDay(PickupDay $pickupDay): array
     {

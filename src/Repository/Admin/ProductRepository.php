@@ -18,23 +18,25 @@ class ProductRepository extends ServiceEntityRepository
     }
 
 
-
     /**
-     * Get product with orders > 0.
+     * Find products by a list of IDs.
      *
+     * @param int[] $ids
      * @return Product[]
      */
-    public function findProductsWithOrderedQuantities(): array
+    public function findProductsByIds(array $ids): array
     {
+        if (empty($ids)) {
+            return [];
+        }
+
         return $this->createQueryBuilder('p')
-            ->join('p.productOrders', 'po')
-            ->join('po.order', 'o')
-            ->andWhere('o.isDeleted = false')
-            ->groupBy('p.id')
-            ->having('SUM(po.quantity) > 0')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
             ->getQuery()
             ->getResult();
     }
+
 
     /**
      * @return int[] Get product IDs that can be deleted (not linked to orders).

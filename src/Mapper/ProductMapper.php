@@ -4,16 +4,17 @@ namespace App\Mapper;
 
 use App\Dto\Product\ProductDto;
 use App\Entity\Product;
+use App\Utils\Translator\UnitTranslator;
 
 class ProductMapper
 {
-    public static function toDto(Product $product): ProductDto
+    public static function toDto(Product $product,  UnitTranslator $translator): ProductDto
     {
         return new ProductDto(
             id: $product->getId(),
             name: $product->getName(),
             price: $product->getPriceInEuros(),
-            unit: $product->getUnit()?->value ?? 'unknown',
+            unit: $translator->translate($product->getUnit()),
             image: '/uploads/images/' . $product->getImage(),
             stock: $product->hasStock() ? $product->getStock() : null,
             limited: $product->isLimited(),
