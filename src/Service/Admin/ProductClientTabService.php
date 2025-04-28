@@ -37,7 +37,7 @@ class ProductClientTabService
         $products = $this->productService
             ->getProductAdminDtosByIds($productIds);
 
-        // 3) Fetch raw quantity data
+        // 3) Fetch  quantity data
         $rawQuantities = $this->productOrderRepository
             ->getUserProductQuantitiesByPickupDay($pickupDay);
 
