@@ -11,21 +11,28 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 #[IsGranted('ROLE_ADMIN')]
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
     public function index(): Response
     {
-        return $this->render('admin/dashboard.html.twig');
+        /** @var AdminUrlGenerator $adminUrlGenerator */
+        $adminUrlGenerator = $this->container->get(\EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator::class);
 
+        $url = $adminUrlGenerator
+            ->setController(\App\Controller\Admin\ProductCrudController::class)
+            ->generateUrl();
+
+        return $this->redirect($url);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<img src="/images/logo.png" alt="Ferme De La Rougeraie" height="100">');    }
+            ->setTitle('<img src="/images/logo.png" alt="Ferme De La Rougeraie" height="100">');
+    }
 
     public function configureMenuItems(): iterable
     {
