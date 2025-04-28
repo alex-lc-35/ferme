@@ -27,7 +27,7 @@ class Product
     #[ORM\Column]
     private ?int $price = null;
 
-    #[ORM\Column(enumType: ProductUnit::class)]
+    #[ORM\Column(nullable: false, enumType: ProductUnit::class )]
     private ?ProductUnit $unit = null;
 
     #[ORM\Column(nullable: true)]
