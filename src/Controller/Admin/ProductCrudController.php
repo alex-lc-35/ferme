@@ -145,7 +145,10 @@ class ProductCrudController extends AbstractCrudController
 
             BooleanField::new('discount')
                 ->hideOnIndex()
-                ->setLabel('Promo'),
+                ->setLabel('Promo')
+                ->setFormTypeOption('row_attr', [
+                    'class' => 'discount-wrapper',
+                ]),
 
             TextField::new('discountText')
                 ->onlyOnForms()
