@@ -1,59 +1,70 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM entièrement chargé');
+    console.log('DOM entièrement chargé pour Tomselected');
 
-    // Utilitaire générique pour afficher/masquer
-    function toggleVisibility(trigger, targetSelector, showCondition) {
-        const target = document.querySelector(targetSelector);
-        if (!trigger || !target) return;
 
-        function update() {
-            target.style.display = showCondition(trigger) ? 'block' : 'none';
-        }
+    const tsControl = document.querySelector('.ts-control');
+    const interWrapper = document.querySelector('.inter-wrapper');
+    const selectElement = document.querySelector('select[name$="[unit]"]');
 
-        trigger.addEventListener('change', update);
-        update(); // Initialiser au chargement
+    // Hide the "inter" field if the "unit"  is not kilo
+
+    function toggleInterField() {
+        const text = selectElement?.options[selectElement.selectedIndex]?.text ?? '';
+        interWrapper.style.display = (text === 'Kilo') ? 'block' : 'none';
+    }
+    if (tsControl && selectElement) {
+        tsControl.addEventListener('click', () => setTimeout(toggleInterField, 100));
+        selectElement.addEventListener('change', toggleInterField);
+        toggleInterField();
     }
 
-    // --- Affichage du champ "inter" selon le select "unit"
-    const selectUnit = document.querySelector('select[name$="[unit]"]');
-    toggleVisibility(selectUnit, '.inter-wrapper', (select) => {
-        const selectedOption = select.options[select.selectedIndex];
-        return selectedOption && selectedOption.text === 'Kilo';
-    });
 
-    // --- Affichage du champ "stock" si "hasStock" est coché
-    const hasStockCheckbox = document.querySelector('input[name$="[hasStock]"]');
-    toggleVisibility(hasStockCheckbox, '.stock-inline-group', (checkbox) => checkbox.checked);
+    // Hide the "stock text" field if the "has_stock" switch is not checked
 
-    // --- Affichage du champ "discount text" si "discount" est coché
-    const discountCheckbox = document.querySelector('input[name$="[discount]"]');
-    toggleVisibility(discountCheckbox, '.discountText-wrapper', (checkbox) => checkbox.checked);
+    const hasStockRow = document.querySelector('.has-stock-wrapper');
+    const stockRow    = document.querySelector('.stock-wrapper');
 
-    // --- Créer dynamiquement le groupement stock + label (comme avant)
-    const hasStockWrapper = document.querySelector('.has-stock-wrapper');
-    const stockWrapper = document.querySelector('.stock-wrapper');
-    if (hasStockWrapper && stockWrapper) {
-        const stockWidget = stockWrapper.querySelector('.form-widget');
-        const stockLabel = stockWrapper.querySelector('label');
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('stock-container');
 
-        const inlineGroup = document.createElement('div');
-        inlineGroup.classList.add('stock-inline-group');
-        inlineGroup.style.display = 'flex';
-        inlineGroup.style.alignItems = 'center';
-        inlineGroup.style.gap = '1rem';
-        inlineGroup.style.marginTop = '0.5rem';
+    hasStockRow.parentNode.insertBefore(wrapper, hasStockRow);
 
-        if (stockLabel) {
-            stockLabel.style.margin = '0';
-            inlineGroup.appendChild(stockLabel);
-        }
+    wrapper.appendChild(hasStockRow);
+    wrapper.appendChild(stockRow);
 
-        if (stockWidget) {
-            stockWidget.style.margin = '0';
-            inlineGroup.appendChild(stockWidget);
-        }
+    const checkbox = hasStockRow.querySelector('input[type="checkbox"]');
 
-        hasStockWrapper.appendChild(inlineGroup);
-        stockWrapper.style.display = 'none';
+    const toggleStock = () => {
+        stockRow.style.display = checkbox.checked ? '' : 'none';
+    };
+
+    toggleStock();
+    checkbox.addEventListener('change', toggleStock);
+
+
+    // Hide the "discount text" field if the "discount" switch is not checked
+
+    const discountRow     = document.querySelector('.discount-wrapper');
+    const discountTextRow = document.querySelector('.discountText-wrapper');
+
+    if (discountRow && discountTextRow) {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('discount-container');
+        discountRow.parentNode.insertBefore(wrapper, discountRow);
+        wrapper.appendChild(discountRow);
+        wrapper.appendChild(discountTextRow);
+
+        const checkbox = discountRow.querySelector('input[type="checkbox"]');
+        const toggleDiscountText = () => {
+            if (checkbox.checked) {
+                discountTextRow.style.removeProperty('display');
+            } else {
+                discountTextRow.style.display = 'none';
+            }
+        };
+
+        toggleDiscountText();
+        checkbox.addEventListener('change', toggleDiscountText);
     }
+
 });

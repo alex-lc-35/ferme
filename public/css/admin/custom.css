@@ -5,3 +5,27 @@
     border-radius: 50%;
     border: 2px solid #ccc;
 }
+
+.stock-container{
+    max-width: 50%;
+    display: flex;
+    gap: 3rem;
+}
+
+.stock-wrapper {
+    width : 10.5rem;
+}
+
+.discount-container {
+    max-width: 50%;
+    display: flex;
+    gap: 3rem;
+}
+
+.discountText-wrapper {
+    width : 50%; ;
+}
+
+.discountText-wrapper label , .stock-wrapper label {
+    display: none;
+}
