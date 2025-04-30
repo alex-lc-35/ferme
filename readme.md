@@ -18,9 +18,9 @@ Backend du projet **Ferme de la Rougeraie**, développé avec **Symfony 7** et *
 git clone https://github.com/votre-repo/ferme_de_la_rougeraie_v2-symfony-backend.git
 cd ferme_de_la_rougeraie_v2-symfony-backend
 ```
-### 2️⃣ **Installer les dépendances PHP**
+### 2️⃣ **Installer Symfony CLI (optionnel)**
 ```sh
-composer install
+https://symfony.com/download
 ```
 
 ### 3️⃣ **Installer les dépendances PHP**
@@ -43,11 +43,18 @@ php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
 ```
 
-### 7️⃣ **Lancer le serveur**
+### 7️⃣ **Lancer le serveur (avec symfony CLI ou le serveur web de PHP )**
 ```sh   
 symfony server:start
+
+symfony serve
+
+php -S 127.0.0.1:8000 -t public
+
 ```
 ### 8️⃣ **Accéder à l'application**
 Ouvrir votre navigateur et accéder à l'URL suivante : 
 ``` sh
  http://127.0.0.1:8000/login
+ http://127.0.0.1:8000/admin
+
