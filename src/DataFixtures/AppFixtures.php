@@ -78,7 +78,7 @@ class AppFixtures extends Fixture
             $product->setLimited($faker->boolean());
             $product->setDiscount($faker->boolean());
             $product->setDiscountText($faker->boolean() ? $faker->sentence() : null);
-            $product->setImage('tomates.jpg');
+            $product->setImage('default.jpg');
             $product->setUser($admin);
 
             $manager->persist($product);

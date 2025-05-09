@@ -1,33 +1,60 @@
-
 ##############
 # IDE / OS
 ##############
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
+.idea/                # Config PhpStorm
+.vscode/              # Config VS Code
+.DS_Store             # Fichier système macOS
+Thumbs.db             # Fichier système Windows
 
-###> symfony/framework-bundle ###
-/.env
-/.env.local
-/.env.local.php
-/.env.*.local
-_docker/.env
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
-###< symfony/framework-bundle ###
+##############
+# Symfony / Env
+##############
+/.env                 # Fichier d'env principal
+/.env.local           # Env local
+/.env.local.php       # Cache de l'env Symfony
+/.env.*.local         # Tous les .env liés à des envs perso
+_docker/.env          # Variables spécifiques à Docker
 
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
+/config/secrets/prod/prod.decrypt.private.php  # Clé privée Symfony prod
 
-###> symfony/asset-mapper ###
-/public/assets/
-/assets/vendor/
+##############
+# Symfony / Dossiers générés
+##############
+/var/                 # Logs, cache, sessions
+/vendor/              # Dépendances PHP installées avec Composer
 
-###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
-###< lexik/jwt-authentication-bundle ###
+##############
+# PHPUnit
+##############
+/phpunit.xml          # Config locale de tests
+.phpunit.result.cache # Cache PHPUnit
+
+##############
+# Asset Mapper / Webpack / Vite
+##############
+/public/assets/       # Assets générés
+/assets/vendor/       # Vendor front
+
+##############
+# JWT (LexikJWTAuthenticationBundle)
+##############
+/config/jwt/*.pem     # Clés privées/publiques JWT
+
+##############
+# Fichiers d'upload
+##############
+/public/uploads/*             # Tous les fichiers uploadés dynamiquement
+!/public/uploads/.gitignore   # On garde un fichier vide pour que le dossier existe
+!/public/uploads/images/default.jpg  # Image utilisée par un seeder ou par défaut
+
+##############
+# NodeJS / JS
+##############
+/node_modules/        # Dépendances JS
+
+##############
+# Tests / Couverture / Outils
+##############
+/coverage/            # Résultats de coverage (ex: PHPUnit, JS)
+*.log                 # Fichiers de log divers
+*.cache               # Caches divers
