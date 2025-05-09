@@ -1,0 +1,37 @@
+services:
+  ferme-back-php:
+    container_name: ferme-back-php
+    image: ferme-back-php-image
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    user: "${UID}:${GID}"
+    environment:
+      - HOME=/tmp
+    env_file:
+      - ../.env
+    volumes:
+      - ../:/var/www/html
+    networks:
+      - sandbox-network
+
+  ferme-back-nginx:
+    container_name: ferme-back-nginx
+    image: nginx:stable
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    expose:
+      - "80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ferme-back.rule=Host(`ferme.me`)"
+      - "traefik.http.routers.ferme-back.entrypoints=web"
+      - "traefik.http.services.ferme-back.loadbalancer.server.port=80"
+      - "traefik.docker.network=sandbox-network"
+    networks:
+      - sandbox-network
+
+networks:
+  sandbox-network:
+    external: true
