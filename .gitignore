@@ -32,6 +32,7 @@ _docker/.env
 # Asset Mapper / Webpack / Vite
 ##############
 /public/assets/
+/public/bundles/
 /assets/vendor/
 
 ##############
@@ -43,7 +44,7 @@ _docker/.env
 # Fichiers d'upload
 ##############
 /public/uploads/*
-!/public/uploads/.gitignore
+!/public/uploads/images/
 !/public/uploads/images/default.jpg
 
 ##############

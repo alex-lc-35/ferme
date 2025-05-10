@@ -1,0 +1,32 @@
+FROM php:8.3-fpm
+
+RUN apt-get update && apt-get install -y \
+    unzip \
+    git \
+    libpq-dev \
+    libzip-dev \
+    libonig-dev \
+    libicu-dev \
+  && docker-php-ext-install pdo pdo_mysql intl opcache \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+WORKDIR /var/www/html
+
+COPY . /var/www/html
+COPY _docker/php/php.ini.prod /usr/local/etc/php/php.ini
+
+# 🔐 Définit qu’on est en production
+ENV APP_ENV=prod
+
+# ✅ Autoriser Git à opérer dans le projet Symfony
+RUN git config --global --add safe.directory /var/www/html
+
+# ✅ Installer les dépendances sans dev
+RUN composer install --no-dev
+
+RUN php bin/console importmap:install \
+ && php bin/console assets:install public \
+ && php bin/console asset-map:compile
