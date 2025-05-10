@@ -1,60 +1,59 @@
 ##############
 # IDE / OS
 ##############
-.idea/                # Config PhpStorm
-.vscode/              # Config VS Code
-.DS_Store             # Fichier système macOS
-Thumbs.db             # Fichier système Windows
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
 
 ##############
 # Symfony / Env
 ##############
-/.env                 # Fichier d'env principal
-/.env.local           # Env local
-/.env.local.php       # Cache de l'env Symfony
-/.env.*.local         # Tous les .env liés à des envs perso
-_docker/.env          # Variables spécifiques à Docker
-
-/config/secrets/prod/prod.decrypt.private.php  # Clé privée Symfony prod
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+_docker/.env
+/config/secrets/prod/prod.decrypt.private.php
 
 ##############
 # Symfony / Dossiers générés
 ##############
-/var/                 # Logs, cache, sessions
-/vendor/              # Dépendances PHP installées avec Composer
+/var/
+/vendor/
 
 ##############
 # PHPUnit
 ##############
-/phpunit.xml          # Config locale de tests
-.phpunit.result.cache # Cache PHPUnit
+/phpunit.xml
+.phpunit.result.cache
 
 ##############
 # Asset Mapper / Webpack / Vite
 ##############
-/public/assets/       # Assets générés
-/assets/vendor/       # Vendor front
+/public/assets/
+/assets/vendor/
 
 ##############
 # JWT (LexikJWTAuthenticationBundle)
 ##############
-/config/jwt/*.pem     # Clés privées/publiques JWT
+/config/jwt/*.pem
 
 ##############
 # Fichiers d'upload
 ##############
-/public/uploads/*             # Tous les fichiers uploadés dynamiquement
-!/public/uploads/.gitignore   # On garde un fichier vide pour que le dossier existe
-!/public/uploads/images/default.jpg  # Image utilisée par un seeder ou par défaut
+/public/uploads/*
+!/public/uploads/.gitignore
+!/public/uploads/images/default.jpg
 
 ##############
 # NodeJS / JS
 ##############
-/node_modules/        # Dépendances JS
+/node_modules/
 
 ##############
 # Tests / Couverture / Outils
 ##############
-/coverage/            # Résultats de coverage (ex: PHPUnit, JS)
-*.log                 # Fichiers de log divers
-*.cache               # Caches divers
+/coverage/
+*.log
+*.cache
