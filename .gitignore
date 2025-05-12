@@ -43,7 +43,7 @@ _docker/.env
 ##############
 # Fichiers d'upload
 ##############
-/public/uploads/*
+/public/uploads/images/*
 !/public/uploads/images/
 !/public/uploads/images/default.jpg
 

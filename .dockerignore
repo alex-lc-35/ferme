@@ -2,12 +2,13 @@ node_modules/
 vendor/
 var/
 
-
 # Fichiers Symfony qu'on ne veut pas copier dans l'image
 /public/assets/
 /public/bundles/
 /assets/vendor/
 
-/public/uploads/*
-!/public/uploads/images/
-!/public/uploads/images/default.jpg
+public/uploads/
+
+
+# Ignorer les fichiers non nécessaires dans les images
+.git
