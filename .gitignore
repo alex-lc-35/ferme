@@ -10,9 +10,7 @@ Thumbs.db
 # Symfony / Env
 ##############
 /.env
-/.env.local
-/.env.local.php
-/.env.*.local
+/.env.prod
 _docker/.env
 /config/secrets/prod/prod.decrypt.private.php
 
@@ -44,8 +42,8 @@ _docker/.env
 # Fichiers d'upload
 ##############
 /public/uploads/images/*
-!/public/uploads/images/
 !/public/uploads/images/default.jpg
+!/public/uploads/images/
 
 ##############
 # NodeJS / JS

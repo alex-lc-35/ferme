@@ -5,7 +5,12 @@ services:
     build:
       context: ..
       dockerfile: _docker/php/Dockerfile.prod
-    user: "${UID}:${GID}"
+      args:
+        APP_UID: ${UID}
+        APP_GID: ${GID}
+    environment:
+      - APP_ENV=prod
+      - APP_DEBUG=0
     volumes:
       - ../public/uploads:/var/www/html/public/uploads/
     networks:
@@ -18,7 +23,7 @@ services:
       context: ..
       dockerfile: _docker/nginx/Dockerfile.nginx
     volumes:
-      - ../public/uploads:/var/www/html/public/uploads/:ro
+      - ../public/uploads:/var/www/html/uploads:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ferme-back-prod.rule=Host(`ferme.me`)"

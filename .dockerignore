@@ -7,8 +7,5 @@ var/
 /public/bundles/
 /assets/vendor/
 
-public/uploads/
-
-
 # Ignorer les fichiers non nécessaires dans les images
 .git
