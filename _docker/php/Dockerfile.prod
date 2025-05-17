@@ -1,8 +1,5 @@
 FROM php:8.3-fpm
 
-ARG APP_UID=1000
-ARG APP_GID=1002
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     unzip git curl libzip-dev zip libicu-dev libonig-dev libpq-dev \
@@ -18,16 +15,20 @@ WORKDIR /var/www/html
 # Copy application code
 COPY . .
 
-# Set correct permissions for cache/logs
+# Fix permissions to allow Symfony to write cache/logs
 RUN mkdir -p var/cache var/log && \
-    chown -R ${APP_UID}:${APP_GID} var
+    chown -R www-data:www-data var
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Warm up cache for prod
+# Warm up cache for prod (as www-data)
+USER www-data
 RUN php bin/console cache:clear --env=prod --no-debug && \
     php bin/console cache:warmup --env=prod --no-debug
+
+# Revert to root for container startup (optional)
+USER root
 
 # Custom PHP config if needed
 COPY _docker/php/php.ini /usr/local/etc/php/php.ini
