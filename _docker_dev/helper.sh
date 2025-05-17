@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Helper multi-commande pour le projet ferme-back (exécuté depuis son propre dossier)
+# Helper multi-commande pour le projet ferme-back dev
 
 PHP_CONTAINER="ferme-back-php"
 NGINX_CONTAINER="ferme-back-nginx"
