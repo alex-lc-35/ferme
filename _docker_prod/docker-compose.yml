@@ -23,7 +23,7 @@ services:
       - ../public/uploads:/var/www/html/uploads:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ferme-back-prod.rule=Host(`ferme.me`)"
+      - "traefik.http.routers.ferme-back-prod.rule=Host(`ferme.rfess.fr`)"
       - "traefik.http.routers.ferme-back-prod.entrypoints=web"
       - "traefik.http.services.ferme-back-prod.loadbalancer.server.port=80"
       - "traefik.docker.network=sandbox-network"
