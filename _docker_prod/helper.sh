@@ -19,6 +19,7 @@ show_help() {
   echo "  logs-nginx         → Afficher les logs du conteneur Nginx"
   echo "  sh-php             → Accès shell dans le conteneur PHP"
   echo "  composer [...]     → Lancer Composer dans le conteneur PHP"
+  echo "  artisan [...]      → Lancer une commande Artisan dans le conteneur PHP"
   echo "  env                → Afficher les variables d'environnement actuelles"
 }
 
@@ -61,6 +62,9 @@ case "$COMMAND" in
   composer)
     docker exec -it "$PHP_CONTAINER" composer "$@"
     ;;
+  artisan)
+    docker exec -it "$PHP_CONTAINER" php /var/www/html/bin/console "$@"
+    ;;
   env)
     docker exec -it "$PHP_CONTAINER" sh -c '
       echo "APP_ENV=$APP_ENV"
@@ -68,7 +72,7 @@ case "$COMMAND" in
       echo "DATABASE_URL=$DATABASE_URL"
       echo "JWT_PASSPHRASE=$JWT_PASSPHRASE"
     '
-   ;;
+    ;;
   *)
     echo "❌ Commande inconnue: $COMMAND"
     show_help
