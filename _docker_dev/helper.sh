@@ -14,7 +14,7 @@ show_help() {
   echo "  down               → Arrêter les services"
   echo "  destroy            → Supprimer complètement les conteneurs"
   echo "  refresh            → Redémarrer complètement les services avec rebuild"
-  echo "  restart            → Redémarrer les services"
+  echo "  refresh-no-cache   → Redémarrer complètement les services avec rebuild sans cache"
   echo "  logs-php           → Afficher les logs du conteneur PHP"
   echo "  logs-nginx         → Afficher les logs du conteneur Nginx"
   echo "  sh-php             → Accès shell dans le conteneur PHP"
@@ -45,8 +45,10 @@ case "$COMMAND" in
     docker compose down
     docker compose up -d --build
     ;;
-  restart)
-    docker compose restart
+  refresh-no-cache)
+    docker compose down
+    docker compose build --no-cache
+    docker compose up -d
     ;;
   logs-php)
     docker logs -f "$PHP_CONTAINER"
