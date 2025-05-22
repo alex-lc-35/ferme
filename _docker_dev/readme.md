@@ -3,12 +3,14 @@
 
 ### **Créer la base de donnée**
 
-### **Dupliquer le fichier .env et modifier les variables**
+### **Dupliquer le fichier .env.example et modifier les variables**
 ```
 APP_SECRET=
 DATABASE_URL=
 JWT_PASSPHRASE=
 ```
+
+### **Dupliquer le fichier _docker_dev/.env.example et modifier les variables**
 
 ### **Ajouter les clés jwt**
 ```

@@ -15,7 +15,7 @@ Thumbs.db
 ##############
 # Docker / Env
 ##############
-/_docker_dev/.env.example
+/_docker_dev/.env
 /_docker_prod/.env
 
 ##############
