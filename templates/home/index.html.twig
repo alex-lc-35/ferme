@@ -3,9 +3,19 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
-    <div >
-        <h1>Bienvenue sur le site </h1>
+    <div>
+        <h1>Bienvenue sur le site</h1>
 
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <button type="submit">Tester le CSRF token</button>
+        </form>
+
+        <p class="small text-muted">Token CSRF : <code>{{ csrf_token('authenticate') }}</code></p>
 
     </div>
 {% endblock %}
